@@ -18,7 +18,7 @@ export function CompletionOverlay({ result, mission, world, artifactNames, onClo
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-bg-deep/80 p-4 backdrop-blur-sm" role="dialog" aria-modal aria-label="Mission complete">
       <motion.div initial={{ opacity: 0, y: 24, scale: 0.98 }} animate={{ opacity: 1, y: 0, scale: 1 }} transition={{ duration: 0.45, ease: [0.2, 0.8, 0.2, 1] }} className="panel hud w-full max-w-4xl overflow-hidden !p-0">
-        <div className="grid grid-cols-1 md:grid-cols-[1.15fr_1fr]">
+        <div className="grid grid-cols-1 md:grid-cols-[minmax(0,1.15fr)_minmax(0,1fr)]">
           <div className="relative min-h-[260px] bg-bg-deep">
             <WorldScene world={world} layers={result.worldAfter.layers} previousLayers={result.worldBefore.layers} className="h-full w-full" showLabels={false} />
             <div className="absolute left-4 top-4 flex items-center gap-2">

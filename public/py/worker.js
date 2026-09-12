@@ -1,8 +1,8 @@
-/* Architect Online — Pyodide runner worker (classic worker, not bundled).
+/* Architect Online — Pyodide runner worker (ES module worker, served from public/, not bundled).
  * Protocol: see src/engine/runner/protocol.ts. Timeouts are enforced by the client
  * (terminate + respawn); this worker only executes and streams output. */
-var PYODIDE_VERSION = "314.0.6";
-var PYODIDE_INDEX = "https://cdn.jsdelivr.net/pyodide/v" + PYODIDE_VERSION + "/full/";
+var PYODIDE_INDEX = self.location.origin + "/py/vendor/";
+import { loadPyodide, version as PYODIDE_VERSION } from "/py/vendor/pyodide.mjs";
 
 var pyodide = null;
 var runJob = null;
@@ -19,8 +19,7 @@ function push(kind, chunk) {
 }
 
 async function init() {
-  importScripts(PYODIDE_INDEX + "pyodide.js");
-  pyodide = await self.loadPyodide({
+  pyodide = await loadPyodide({
     indexURL: PYODIDE_INDEX,
     stdout: function (line) { push("stdout", line + "\n"); },
     stderr: function (line) { push("stderr", line + "\n"); },

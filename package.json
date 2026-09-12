@@ -10,7 +10,10 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "db:generate": "drizzle-kit generate",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "postinstall": "node scripts/vendor-pyodide.mjs",
+    "predev": "node scripts/vendor-pyodide.mjs",
+    "prebuild": "node scripts/vendor-pyodide.mjs"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.125.0",

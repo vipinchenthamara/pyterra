@@ -98,7 +98,7 @@ export function WorldMap({ nodes, currentId, compact = false, className = "" }: 
                 {(isCurrent || n.visual === "active") && <span className="absolute inset-0 -m-1.5 animate-pulse-slow rounded-full border" style={{ borderColor: t.stroke, opacity: 0.6 }} />}
               </div>
               {!compact && (
-                <div className="mt-1.5 whitespace-nowrap text-center">
+                <div className="mt-1.5 hidden whitespace-nowrap text-center md:block">
                   <div className={cn("font-display text-[12.5px] font-semibold leading-tight", n.visual === "locked" ? "text-fg-4" : "text-fg")}>{n.name}</div>
                   <div className={cn("readout text-[11px]", t.text)}>{n.visual === "locked" ? "SIGNAL LOST" : `${n.pct}%`}</div>
                 </div>

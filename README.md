@@ -1,36 +1,50 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Architect Online
 
-## Getting Started
+A personal, world-based Python learning environment. You do not complete chapters. You restore, expand and
+upgrade sixteen districts by writing Python, and a Claude-powered teaching assistant helps without spoiling.
 
-First, run the development server:
+## Run it
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open http://localhost:3000. The first run creates `data/architect.db` (SQLite) and vendors the Pyodide runtime
+into `public/py/vendor/` so Python runs entirely in your browser, offline, with no server-side code execution.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Enable the Claude tutor
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Copy `.env.local.example` to `.env.local` and set `ANTHROPIC_API_KEY`. Without a key the assistant runs in
+offline mode (authored hints only) and every other feature works unchanged.
 
-## Learn More
+## Scripts
 
-To learn more about Next.js, take a look at the following resources:
+| Command | What it does |
+|---|---|
+| `npm run dev` | Dev server (Turbopack) |
+| `npm test` | Vitest: engine unit tests, content integrity, and every mission's starter + reference solution executed in real Pyodide |
+| `npm run typecheck` | `tsc --noEmit` |
+| `npm run lint` | ESLint |
+| `npm run db:generate` | Regenerate Drizzle migrations after editing `src/db/schema.ts` |
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Layout
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- `content/` — worlds, missions, skills (data only, validated by Zod). See `docs/authoring-guide.md` to add a mission.
+- `public/py/` — Pyodide worker and the Python test harness.
+- `src/engine/` — pure functions: mastery, spaced review, world state, recommendation, error coach.
+- `src/server/` — completion transaction and the dashboard snapshot.
+- `src/tutor/` — provider-abstracted tutor (Anthropic or mock), hint-ladder policy.
+- `src/app/` — Next.js routes and API handlers. `src/components/` — UI.
+- `docs/superpowers/specs/` — the design spec for milestone 1.
 
-## Deploy on Vercel
+## Milestones
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+1. **Now:** shell, engine, Worlds 1–2 authored (Foundation District, Data Vault), tutor, review queue.
+2. Worlds 3–5 (Logic Gate, Drone Fleet, Automation Factory), variant review tests.
+3. Worlds 6–9.
+4. Server-side runner for Worlds 10–16 (packages, FastAPI, Docker, LLM, RAG, agents).
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Reset
+
+Profile → Reset all progress, or delete `data/architect.db*` while the server is stopped.

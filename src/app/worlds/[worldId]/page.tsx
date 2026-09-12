@@ -42,7 +42,7 @@ export default async function WorldPage({ params, searchParams }: PageProps<"/wo
       <Link href="/worlds" className="font-mono text-[11.5px] uppercase tracking-wider text-fg-3 hover:text-cyan">‹ Worlds</Link>
 
       {/* Hero */}
-      <section className="panel hud grid grid-cols-1 gap-0 overflow-hidden !p-0 lg:grid-cols-[1.1fr_1fr]">
+      <section className="panel hud grid grid-cols-1 gap-0 overflow-hidden !p-0 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)]">
         <div className="relative min-h-[300px] bg-bg-deep">
           <WorldScene world={world} layers={wv.computed.layers} locked={locked} className="h-full w-full" />
           <div className="absolute bottom-3 left-3 right-3 grid grid-cols-2 gap-2 rounded-lg border border-line bg-bg-deep/80 p-3 backdrop-blur md:grid-cols-4">
@@ -97,7 +97,7 @@ export default async function WorldPage({ params, searchParams }: PageProps<"/wo
         </div>
       </section>
 
-      <section className="grid grid-cols-1 gap-5 lg:grid-cols-[1fr_320px]">
+      <section className="grid grid-cols-1 gap-5 lg:grid-cols-[minmax(0,1fr)_320px]">
         <div className="flex flex-col gap-3">
           {tab === "missions" && (
             <>

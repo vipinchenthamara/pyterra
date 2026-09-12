@@ -13,7 +13,8 @@ export function completionStatement(opts: { hintsUsed: number; skillName: string
   const { hintsUsed, skillName, health, runs } = opts;
   const how = hintsUsed === 0 ? "without hints" : hintsUsed === 1 ? "with one hint" : `with ${hintsUsed} hints`;
   const runsText = runs === 1 ? "on the first run" : `in ${runs} runs`;
-  return `Solved ${how} ${runsText}. ${skillName} is now ${health === "fragile" ? "still fragile" : health}.`;
+  const label = health === "fragile" ? "still fragile" : health === "developing" ? "developing" : health === "stable" ? "stable" : health === "mastered" ? "mastered" : "introduced";
+  return `Solved ${how} ${runsText}. ${skillName} is now ${label}.`;
 }
 
 export function repairLine(worldName: string, skillName: string, minutes: number): string {

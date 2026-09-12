@@ -180,14 +180,14 @@ export function captionFor(kind: SceneLayer["kind"], slot: Slot): { x: number; y
     case "light":
       return { x: 626, y: 352, anchor: "end" };
     case "shield":
-      return { x: 320, y: slot.y + 12, anchor: "middle" };
+      return { x: 320, y: slot.y - 6, anchor: "middle" };
     case "drone":
       return { x: slot.x + slot.width / 2, y: slot.y - 4, anchor: "middle" };
     case "dataflow": {
-      // A quarter of the way along the arc, so it never sits on the spire the arc passes over.
+      // Near the LOWER end of the arc (never the spire end, never the apex over a spire).
       const [a, b] = slot.anchors ?? [];
       if (!a || !b) return { x: slot.x + slot.width / 2, y: slot.y + 4, anchor: "middle" };
-      const t = 0.22;
+      const t = a.y < b.y ? 0.78 : 0.22;
       const cy = slot.y + 8;
       const k = 1 - t;
       const x = k * k * k * a.x + 3 * k * k * t * (a.x + (b.x - a.x) * 0.25) + 3 * k * t * t * (a.x + (b.x - a.x) * 0.75) + t * t * t * b.x;

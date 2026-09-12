@@ -32,7 +32,8 @@ describe("mastery", () => {
   it("labels health", () => {
     expect(health(emptySkillState("a"), now)).toBe("dormant");
     const weak = applyCompletion(emptySkillState("a"), { hintsUsed: 6, runs: 9, role: "primary" }, now);
-    expect(health(weak, now)).toBe("fragile");
+    expect(health(weak, now)).toBe("developing");
+    expect(health({ ...weak, timesPracticed: 2 }, now)).toBe("fragile");
     const strong = { ...emptySkillState("a"), understanding: 90, recall: 90, application: 90, independence: 90, timesPracticed: 5, reviewsDone: 3, intervalIdx: 3 };
     expect(health(strong, now)).toBe("mastered");
     expect(health({ ...strong, reviewsDone: 1 }, now)).toBe("stable");
@@ -119,7 +120,7 @@ describe("recommend", () => {
     expect(nextMission({ ...base(), sessionMinutes: 4 })).toBeUndefined();
   });
   it("builds a briefing with reviews first", () => {
-    const st = applyCompletion(emptySkillState("variables"), { hintsUsed: 6, runs: 9, role: "primary" }, now);
+    const st = { ...applyCompletion(emptySkillState("variables"), { hintsUsed: 6, runs: 9, role: "primary" }, now), timesPracticed: 2 };
     const cards = buildBriefing({
       ...base(), streakDays: 3, artifacts: [{ id: "art", worldId: "w", unlockedBy: ["m1", "m2"] }], unlockedArtifactIds: new Set(),
       skillStates: new Map([["variables", st]]),

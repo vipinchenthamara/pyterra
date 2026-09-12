@@ -37,7 +37,7 @@ class PyodideClient {
   }
 
   private spawn(): ManagedWorker {
-    const worker = new Worker("/py/worker.js");
+    const worker = new Worker("/py/worker.js", { type: "module" });
     const ready = new Promise<void>((resolve, reject) => {
       const onMsg = (ev: MessageEvent<WorkerResponse>) => {
         if (ev.data.type === "ready") {

@@ -42,7 +42,7 @@ function Blink({ on, dur = "1.8s" }: { on: boolean; dur?: string }) {
 }
 
 // ---------------------------------------------------------------------------
-export function Ground({ level, slot, accent, compact, ids }: LayerRenderProps): JSX.Element {
+export function Ground({ level, accent, compact, ids }: LayerRenderProps): JSX.Element {
   const p = paint(level === 0);
   const [bx0, bx1, by, tx0, tx1, ty] = [70, 570, 352, 214, 426, 262];
   const plate = `${tx0},${ty} ${tx1},${ty} ${bx1},${by} ${bx0},${by}`;
@@ -52,7 +52,6 @@ export function Ground({ level, slot, accent, compact, ids }: LayerRenderProps):
   const horizontals = Array.from({ length: rows - 1 }, (_, k) => ty + (by - ty) * Math.pow((k + 1) / rows, 1.5));
   const grid = p.ghost ? p.edge : rgba(accent, 0.22);
   const id = ids.prefix;
-  void slot;
   return (
     <g>
       <defs>

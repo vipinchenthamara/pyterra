@@ -43,3 +43,4 @@ next-env.d.ts
 # local database
 /data/
 .env.local
+/public/py/vendor/

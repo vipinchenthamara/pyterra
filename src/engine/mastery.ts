@@ -103,7 +103,10 @@ export function health(stateRaw: SkillStateLike, now: Date): SkillHealth {
   if (state.timesPracticed === 0) return "dormant";
   const m = mastery(state);
   const overdueDays = state.nextReviewAt ? (now.getTime() - new Date(state.nextReviewAt).getTime()) / DAY_MS : 0;
-  if (m < 40 || overdueDays > 7) return "fragile";
+  // Fragile = demonstrated more than once and still weak, or a repair is badly overdue.
+  // A single clean first demonstration is "developing", never "fragile".
+  if (overdueDays > 7) return "fragile";
+  if (m < 40 && state.timesPracticed >= 2) return "fragile";
   if (m > 85 && state.reviewsDone >= 3 && state.intervalIdx >= 3) return "mastered";
   if (m >= 70) return "stable";
   return "developing";

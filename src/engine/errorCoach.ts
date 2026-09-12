@@ -19,6 +19,7 @@ interface GenericRule {
 }
 
 export const GENERIC_RULES: GenericRule[] = [
+  { match: /did not finish in time|TimeoutError/, title: "Your code never finished", explanation: "Execution was halted at the time limit. The usual cause is a loop whose condition never becomes false, or waiting on input() which is not available here. Check every while loop for a line that changes the condition." },
   { match: /NameError: name '(\w+)' is not defined/, title: "Python has never heard of that name", explanation: "You used a name before giving it a value, or spelled it differently from where it was assigned. Check the spelling and make sure the assignment line runs before this one." },
   { match: /can only concatenate str \(not "int"\) to str|can only concatenate str \(not "float"\) to str/, title: "Text and numbers cannot be glued together directly", explanation: "You used + between a string and a number. Either convert the number with str(...) or build the text with an f-string: f\"Power: {total}\"." },
   { match: /unsupported operand type\(s\) for \+: 'int' and 'str'|unsupported operand type\(s\) for [+\-*/]+: '(?:int|float)' and 'str'/, title: "A number met a string in arithmetic", explanation: "One of the values is still text, probably because it came from a sensor or user input. Convert it with int(...) or float(...) before doing maths." },
