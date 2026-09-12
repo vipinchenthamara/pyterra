@@ -17,13 +17,18 @@ export const mockProvider: TutorProvider = {
         text = ctx.code ? `Your code has ${ctx.code.split("\n").filter((l) => l.trim() && !l.trim().startsWith("#")).length} non-comment lines. Read each assignment and ask: what type is on the right-hand side? Mental model: ${anchor}.` : "No code yet.";
         break;
       case "quiz":
-        text = `Quick check: in one sentence, what does "${anchor}" mean in practice for this mission?`;
+        text = ctx.anchorLines.length ? `Quick check: in one sentence, what does "${anchor}" mean in practice for this mission?` : "Open a mission and I will quiz you on the concept in front of you. Your next recommended mission is on the dashboard.";
         break;
       case "why-works":
         text = `It works because you applied "${anchor}". Name one input that could still break it.`;
         break;
-      default:
-        text = `Offline mode. Mental model for this mission: ${anchor}. Add an ANTHROPIC_API_KEY to .env.local to talk to Claude.`;
+      default: {
+        const next = ctx.progressBlock.match(/NEXT RECOMMENDED: (.+)/)?.[1];
+        const due = ctx.progressBlock.match(/REVIEWS DUE: (.+)/)?.[1];
+        text = ctx.anchorLines.length
+          ? `Offline mode. Mental model for this mission: ${anchor}. Add an ANTHROPIC_API_KEY to .env.local to talk to Claude.`
+          : `Offline mode. ${due && due !== "none" ? `Repairs due: ${due}. ` : ""}Next recommended: ${next ?? "open the dashboard"}. Add an ANTHROPIC_API_KEY to .env.local to talk to Claude.`;
+      }
     }
     return { text, tokensIn: 0, tokensOut: 0 };
   },
