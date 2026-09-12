@@ -14,6 +14,10 @@ export interface LearnerSettings {
   dailyTokenBudget: number;
   notes: Record<string, string>; // skillId -> personal note
   predictedOutputs?: Record<string, string>;
+  /** World ids whose arrival screen has been seen. */
+  arrivedWorlds?: string[];
+  /** First-run walkthrough dismissed. */
+  onboarded?: boolean;
 }
 
 export const learnerProfile = sqliteTable("learner_profile", {

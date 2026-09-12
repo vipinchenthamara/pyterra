@@ -26,6 +26,8 @@ export const DEFAULT_SETTINGS: LearnerSettings = {
   tutorEnabled: true,
   dailyTokenBudget: 200_000,
   notes: {},
+  arrivedWorlds: [],
+  onboarded: false,
 };
 
 export function ensureProfile(db: Db = getDb()): LearnerProfileRow {
@@ -52,6 +54,18 @@ export function touchActivity(now: Date, db: Db = getDb()): LearnerProfileRow {
   }
   updateProfile({ lastActiveAt: now.toISOString(), streakDays: streak }, db);
   return { ...p, lastActiveAt: now.toISOString(), streakDays: streak };
+}
+
+export function markArrived(worldId: string, db: Db = getDb()) {
+  const p = ensureProfile(db);
+  const arrived = new Set(p.settings.arrivedWorlds ?? []);
+  if (arrived.has(worldId)) return;
+  arrived.add(worldId);
+  updateProfile({ settings: { ...p.settings, arrivedWorlds: [...arrived] } }, db);
+  addEvent("arrival", `You entered a new district`, { worldId }, db);
+}
+export function hasArrived(worldId: string, db: Db = getDb()): boolean {
+  return (ensureProfile(db).settings.arrivedWorlds ?? []).includes(worldId);
 }
 
 // Attempts -------------------------------------------------------------------

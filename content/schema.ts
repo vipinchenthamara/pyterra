@@ -28,6 +28,25 @@ export const SkillDomain = z.enum([
   "ai",
 ]);
 
+/** A note in a skill primer: one idea, one runnable snippet, its expected output. Shown free of charge. */
+export const PrimerNoteSchema = z.object({
+  title: z.string().min(1),
+  /** 1–3 sentences, plain language, ties to the world. */
+  body: z.string().min(1),
+  /** 1–4 lines of Python that print something. Runs in the learner's browser. */
+  code: z.string().min(1),
+  /** Expected stdout (trimmed). Verified by tests. */
+  output: z.string().min(1),
+});
+
+export const PrimerSchema = z.object({
+  /** Why this skill exists in the world, 2–3 sentences. Problem first. */
+  intro: z.string().min(1),
+  notes: z.array(PrimerNoteSchema).min(2).max(5),
+  /** One line the learner can say back: the mental model in their own words. */
+  takeaway: z.string().min(1),
+});
+
 export const SkillSchema = z.object({
   id: Id,
   name: z.string().min(1),
@@ -36,6 +55,8 @@ export const SkillSchema = z.object({
   anchor: z.string().min(1),
   description: z.string().min(1),
   prerequisites: z.array(Id).default([]),
+  /** Required for every skill used by an authored world (registry enforces). */
+  primer: PrimerSchema.optional(),
 });
 
 // ---------------------------------------------------------------------------
@@ -211,6 +232,8 @@ export const MissionSchema = z.object({
 // ---------------------------------------------------------------------------
 export type Skill = z.infer<typeof SkillSchema>;
 export type SkillInput = z.input<typeof SkillSchema>;
+export type Primer = z.infer<typeof PrimerSchema>;
+export type PrimerNote = z.infer<typeof PrimerNoteSchema>;
 export type SceneLayer = z.infer<typeof SceneLayerSchema>;
 export type ArtifactDef = z.infer<typeof ArtifactDefSchema>;
 export type World = z.infer<typeof WorldSchema>;

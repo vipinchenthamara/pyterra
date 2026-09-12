@@ -15,6 +15,7 @@ const Patch = z.object({
       tutorEnabled: z.boolean().optional(),
       dailyTokenBudget: z.number().int().min(0).optional(),
       notes: z.record(z.string(), z.string()).optional(),
+      onboarded: z.boolean().optional(),
     })
     .optional(),
 });

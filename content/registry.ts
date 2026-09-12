@@ -14,6 +14,7 @@ import {
   type WorldInput,
 } from "./schema";
 import { skills as skillInputs } from "./skills";
+import { primers } from "./primers";
 import { worldPacks } from "./worlds";
 
 export interface WorldPack {
@@ -35,7 +36,11 @@ function parseAll<T>(label: string, schema: { safeParse: (v: unknown) => { succe
   });
 }
 
-export const skills: readonly Skill[] = parseAll<Skill>("skill", SkillSchema, skillInputs);
+export const skills: readonly Skill[] = parseAll<Skill>(
+  "skill",
+  SkillSchema,
+  skillInputs.map((s) => ({ ...s, primer: s.primer ?? primers[s.id] })),
+);
 export const worlds: readonly World[] = parseAll<World>(
   "world",
   WorldSchema,
@@ -101,6 +106,9 @@ export function validateRegistry(): void {
   for (const s of skills) {
     for (const p of s.prerequisites) if (!skillById.has(p)) errors.push(`Skill "${s.id}" prerequisite "${p}" does not exist`);
   }
+  for (const id of Object.keys(primers)) if (!skillById.has(id)) errors.push(`Primer for unknown skill "${id}"`);
+  const authoredSkillIds = new Set(worlds.filter((w) => w.status === "authored").flatMap((w) => w.skillIds));
+  for (const id of authoredSkillIds) if (!skillById.get(id)?.primer) errors.push(`Skill "${id}" is used by an authored world but has no primer (content/primers.ts)`);
   const artifactIds = new Set<string>();
   for (const w of worlds) {
     for (const sid of w.skillIds) if (!skillById.has(sid)) errors.push(`World "${w.id}" skill "${sid}" does not exist`);

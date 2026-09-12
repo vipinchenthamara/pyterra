@@ -6,9 +6,9 @@ import { cn } from "@/lib/cn";
 
 const LEVEL_NAMES = ["Nudge", "Concept", "Example", "Shape", "Partial code", "Full walkthrough"];
 
-export function HintLadder({ hints, revealed, onReveal, canRevealFull, fullReason }: { hints: Ladder; revealed: number; onReveal: (level: number) => void; canRevealFull: boolean; fullReason: string }) {
+export function HintLadder({ hints, revealed, onReveal, canRevealFull, fullReason, embedded = false }: { hints: Ladder; revealed: number; onReveal: (level: number) => void; canRevealFull: boolean; fullReason: string; embedded?: boolean }) {
   return (
-    <div className="panel !p-4">
+    <div className={embedded ? "" : "panel !p-4"}>
       <div className="mb-3 flex items-center gap-2">
         <Lightbulb className="h-4 w-4 text-amber-2" />
         <h3 className="font-display text-[14px] font-semibold tracking-wide">Hints</h3>

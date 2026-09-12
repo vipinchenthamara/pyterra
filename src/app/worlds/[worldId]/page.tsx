@@ -79,11 +79,14 @@ export default async function WorldPage({ params, searchParams }: PageProps<"/wo
             </div>
           ) : (
             wv.nextMissionId && (
-              <Link href={`/missions/${wv.nextMissionId}`} className="w-fit">
-                <Button>
-                  Continue Mission <ArrowRight className="h-4 w-4" />
-                </Button>
-              </Link>
+              <div className="flex flex-wrap items-center gap-3">
+                <Link href={`/missions/${wv.nextMissionId}`}>
+                  <Button>
+                    Continue Mission <ArrowRight className="h-4 w-4" />
+                  </Button>
+                </Link>
+                <Link href={`/worlds/${world.id}/arrive`} className="font-mono text-[11px] uppercase tracking-wider text-fg-3 hover:text-cyan">Read the arrival briefing</Link>
+              </div>
             )
           )}
           <nav className="mt-auto flex gap-1 border-b border-line" aria-label="World sections">

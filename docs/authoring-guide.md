@@ -49,6 +49,15 @@ Only use what the world (and earlier worlds) teach. Cumulative ladder:
 - World 5 (Automation Factory): + full functions: parameters, defaults, keyword args, return values incl. tuples, scope, functions calling functions, `*args` (light).
 Tests may use anything. The learner's required code must stay inside the ladder for that world.
 
+## Skill primers (required for every skill an authored world uses)
+The "Learn" step: shown free of charge before the first mission that uses a skill the learner has not practised,
+and reachable any time from the Build view's Concept tab. Lives in `content/primers.ts`, keyed by skill id.
+- `intro`: 2–3 sentences, problem first, in the world's framing. Why the district needs this.
+- `notes`: 2–5, one idea each, in the order a beginner needs them. `code` is 1–5 lines that print; `output` is
+  EXACTLY what Python prints (verified by `content/primers.test.ts`). Only syntax from that world's ladder or earlier.
+- `takeaway`: one sentence the learner can say back.
+The registry refuses to load if a skill used by an authored world has no primer, so author the primer with the world.
+
 ## Review variants (required on every mission)
 Spaced review must "reuse the concept in a new context rather than repeat the same question" (PRD §11).
 Every mission carries a `reviewVariant` with `briefing`, `objective`, `starterCode`, `referenceSolution`, `tests`:

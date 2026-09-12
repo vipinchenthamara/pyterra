@@ -10,6 +10,7 @@ import { WhatYouBuilt } from "@/components/dashboard/WhatYouBuilt";
 import { SystemEvents } from "@/components/dashboard/SystemEvents";
 import { Button, Badge } from "@/components/ui";
 import { operationalLine } from "@/engine/voice";
+import { Welcome } from "@/components/dashboard/Welcome";
 
 export const dynamic = "force-dynamic";
 
@@ -23,6 +24,7 @@ export default async function Home({ searchParams }: PageProps<"/">) {
 
   return (
     <div className="mx-auto flex max-w-[1400px] flex-col gap-5">
+      {!snapshot.profile.settings.onboarded && <Welcome firstWorldId={snapshot.worlds[0].world.id} />}
       {/* Hero + map */}
       <section className="panel hud relative overflow-hidden p-6 md:p-8">
         <div className="relative z-10 flex flex-col gap-6 lg:flex-row lg:items-start">
