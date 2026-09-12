@@ -30,6 +30,9 @@ export default async function ReviewPage({ params }: PageProps<"/review/[reviewI
       skills={[{ id: skill.id, name: skill.name, isNew: false }]}
       primers={view.primers.map((p) => ({ ...p, isNew: false }))}
       checks={visibleChecks(mission)}
+      art={view.art}
+      operationalPct={view.operationalPct}
+      worldLayers={view.worldLayers}
     />
   );
 }

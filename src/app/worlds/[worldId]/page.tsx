@@ -4,7 +4,8 @@ import { ArrowRight, CheckCircle2, Circle, Lock, Clock, Boxes, Wrench } from "lu
 import { getSkill, getWorld, missionsForWorld } from "@content/registry";
 import { getSnapshot } from "@/server/state";
 import * as repo from "@/db/repos";
-import { WorldScene } from "@/components/world/WorldScene";
+import { ArtScene } from "@/components/world/ArtScene";
+import { artForWorld } from "@/server/art";
 import { Badge, Button, ProgressBar, type Tone } from "@/components/ui";
 import { HEALTH_TONE } from "@/components/dashboard/SkillHealth";
 import { HEALTH_LABEL } from "@/engine/mastery";
@@ -34,6 +35,7 @@ export default async function WorldPage({ params, searchParams }: PageProps<"/wo
   const dueHere = s.reviewsDue.filter((r) => missions.some((m) => m.id === r.missionId));
   const stats = wv.computed.stats;
   const nextWorld = s.worlds.find((w) => w.world.unlockedBy.includes(world.id));
+  const art = artForWorld(world.id);
 
   const TABS = ["missions", "about", "skills", "gallery"] as const;
 
@@ -43,8 +45,8 @@ export default async function WorldPage({ params, searchParams }: PageProps<"/wo
 
       {/* Hero */}
       <section className="panel hud grid grid-cols-1 gap-0 overflow-hidden !p-0 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)]">
-        <div className="relative min-h-[300px] bg-bg-deep">
-          <WorldScene world={world} layers={wv.computed.layers} locked={locked} className="h-full w-full" />
+        <div className="relative min-h-[340px] bg-bg-deep">
+          <ArtScene world={world} art={art} operationalPct={wv.computed.operationalPct} layers={wv.computed.layers} locked={locked} parallax className="h-full w-full" />
           <div className="absolute bottom-3 left-3 right-3 grid grid-cols-2 gap-2 rounded-lg border border-line bg-bg-deep/80 p-3 backdrop-blur md:grid-cols-4">
             <Metric label="Operational" value={`${wv.computed.operationalPct}%`} />
             <Metric label="Structures" value={String(Object.values(wv.computed.layers).filter((l) => l > 0).length)} sub={`/ ${world.scene.layers.length}`} />
@@ -200,7 +202,7 @@ export default async function WorldPage({ params, searchParams }: PageProps<"/wo
               <div className="panel md:col-span-2">
                 <div className="label mb-2">Snapshot</div>
                 <div className="aspect-[16/9] w-full overflow-hidden rounded-lg bg-bg-deep">
-                  <WorldScene world={world} layers={wv.computed.layers} locked={locked} className="h-full w-full" />
+                  <ArtScene world={world} art={art} operationalPct={wv.computed.operationalPct} layers={wv.computed.layers} locked={locked} className="h-full w-full" />
                 </div>
               </div>
             </div>

@@ -1,0 +1,82 @@
+{
+  "foundation-district": [
+    "/art/foundation-district/stage-0.jpg",
+    "/art/foundation-district/stage-1.jpg",
+    "/art/foundation-district/stage-2.jpg"
+  ],
+  "data-vault": [
+    "/art/data-vault/stage-0.jpg",
+    "/art/data-vault/stage-1.jpg",
+    "/art/data-vault/stage-2.jpg"
+  ],
+  "logic-gate": [
+    "/art/logic-gate/stage-0.jpg",
+    "/art/logic-gate/stage-1.jpg",
+    "/art/logic-gate/stage-2.jpg"
+  ],
+  "drone-fleet": [
+    "/art/drone-fleet/stage-0.jpg",
+    "/art/drone-fleet/stage-1.jpg",
+    "/art/drone-fleet/stage-2.jpg"
+  ],
+  "automation-factory": [
+    "/art/automation-factory/stage-0.jpg",
+    "/art/automation-factory/stage-1.jpg",
+    "/art/automation-factory/stage-2.jpg"
+  ],
+  "resilience-reactor": [
+    "/art/resilience-reactor/stage-0.jpg",
+    "/art/resilience-reactor/stage-1.jpg",
+    "/art/resilience-reactor/stage-2.jpg"
+  ],
+  "archive-core": [
+    "/art/archive-core/stage-0.jpg",
+    "/art/archive-core/stage-1.jpg",
+    "/art/archive-core/stage-2.jpg"
+  ],
+  "network-district": [
+    "/art/network-district/stage-0.jpg",
+    "/art/network-district/stage-1.jpg",
+    "/art/network-district/stage-2.jpg"
+  ],
+  "architect-lab": [
+    "/art/architect-lab/stage-0.jpg",
+    "/art/architect-lab/stage-1.jpg",
+    "/art/architect-lab/stage-2.jpg"
+  ],
+  "runtime-grid": [
+    "/art/runtime-grid/stage-0.jpg",
+    "/art/runtime-grid/stage-1.jpg",
+    "/art/runtime-grid/stage-2.jpg"
+  ],
+  "concurrent-city": [
+    "/art/concurrent-city/stage-0.jpg",
+    "/art/concurrent-city/stage-1.jpg",
+    "/art/concurrent-city/stage-2.jpg"
+  ],
+  "service-hub": [
+    "/art/service-hub/stage-0.jpg",
+    "/art/service-hub/stage-1.jpg",
+    "/art/service-hub/stage-2.jpg"
+  ],
+  "deployment-yard": [
+    "/art/deployment-yard/stage-0.jpg",
+    "/art/deployment-yard/stage-1.jpg",
+    "/art/deployment-yard/stage-2.jpg"
+  ],
+  "intelligence-core": [
+    "/art/intelligence-core/stage-0.jpg",
+    "/art/intelligence-core/stage-1.jpg",
+    "/art/intelligence-core/stage-2.jpg"
+  ],
+  "memory-engine": [
+    "/art/memory-engine/stage-0.jpg",
+    "/art/memory-engine/stage-1.jpg",
+    "/art/memory-engine/stage-2.jpg"
+  ],
+  "autonomous-command": [
+    "/art/autonomous-command/stage-0.jpg",
+    "/art/autonomous-command/stage-1.jpg",
+    "/art/autonomous-command/stage-2.jpg"
+  ]
+}

@@ -2,6 +2,9 @@ import { getSkill, getWorld, missionsForWorld } from "@content/registry";
 import type { Mission } from "@content/schema";
 import * as repo from "@/db/repos";
 import type { PrimerView } from "@/components/mission/PrimerStep";
+import { artForWorld } from "./art";
+import { computeAllWorlds } from "@/engine/worldState";
+import { worlds } from "@content/registry";
 
 /** Visible test docstrings, in definition order, for the objective checklist. */
 export function visibleChecks(m: Mission): string[] {
@@ -28,7 +31,11 @@ export function missionViewProps(m: Mission) {
     return { id: s.id, name: s.name, anchor: s.anchor, description: s.description };
   });
   const ms = missionsForWorld(world.id);
+  const computed = computeAllWorlds(worlds, missionsForWorld, repo.passedMissionIds()).get(world.id)!;
   return {
+    art: artForWorld(world.id),
+    operationalPct: computed.operationalPct,
+    worldLayers: computed.layers,
     world: { id: world.id, name: world.name, accent: world.accent, scene: world.scene, codename: world.codename },
     anchors,
     skills,

@@ -1,7 +1,9 @@
 import Link from "next/link";
 import { Lock, ArrowRight } from "lucide-react";
 import { getSnapshot } from "@/server/state";
-import { WorldMap } from "@/components/dashboard/WorldMap";
+import { Atlas } from "@/components/dashboard/Atlas";
+import { ArtScene } from "@/components/world/ArtScene";
+import { artForWorld } from "@/server/art";
 import { Badge, ProgressBar, type Tone } from "@/components/ui";
 import { cn } from "@/lib/cn";
 
@@ -12,7 +14,7 @@ const VISUAL_LABEL: Record<string, string> = { complete: "Operational", active: 
 
 export default async function WorldsPage() {
   const s = getSnapshot();
-  const nodes = s.worlds.map((w) => ({ id: w.world.id, order: w.world.order, name: w.world.name, codename: w.world.codename, pct: w.computed.operationalPct, visual: w.visual, accent: w.world.accent }));
+  const tiles = s.worlds.map((w) => ({ world: { id: w.world.id, name: w.world.name, accent: w.world.accent, scene: w.world.scene, codename: w.world.codename, order: w.world.order }, art: artForWorld(w.world.id), pct: w.computed.operationalPct, layers: w.computed.layers, visual: w.visual }));
   return (
     <div className="mx-auto flex max-w-[1400px] flex-col gap-6">
       <header>
@@ -20,14 +22,18 @@ export default async function WorldsPage() {
         <p className="text-[13.5px] text-fg-3">Sixteen districts. Each one unlocks when the previous is fully operational.</p>
       </header>
       <section className="panel hud p-4">
-        <WorldMap nodes={nodes} currentId={s.profile.lastWorldId} />
+        <Atlas tiles={tiles} currentId={s.profile.lastWorldId} />
       </section>
       <section className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
         {s.worlds.map((w) => {
           const locked = w.visual === "locked";
           const tone = VISUAL_TONE[w.visual];
           return (
-            <Link key={w.world.id} href={`/worlds/${w.world.id}`} className={cn("panel group flex flex-col gap-3 !p-4 transition-colors hover:border-line-2", locked && "opacity-70")}>
+            <Link key={w.world.id} href={`/worlds/${w.world.id}`} className={cn("panel group flex flex-col gap-3 overflow-hidden !p-0 transition-colors hover:border-line-2", locked && "opacity-80")}>
+              <div className="relative aspect-[16/9] w-full">
+                <ArtScene world={w.world} art={artForWorld(w.world.id)} operationalPct={w.computed.operationalPct} layers={w.computed.layers} locked={locked} compact hud={false} className="h-full w-full" />
+              </div>
+              <div className="flex flex-col gap-3 px-4 pb-4">
               <div className="flex items-center gap-2">
                 <span className="readout text-[11px] text-fg-3">{w.world.codename}</span>
                 <Badge tone={tone} className="ml-auto">{locked && <Lock className="h-3 w-3" />} {VISUAL_LABEL[w.visual]}</Badge>
@@ -49,6 +55,7 @@ export default async function WorldsPage() {
                   Continue <ArrowRight className="h-3 w-3" />
                 </span>
               )}
+              </div>
             </Link>
           );
         })}

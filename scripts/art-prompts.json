@@ -1,0 +1,74 @@
+{
+  "style": "Isometric low-poly floating island district at night, floating in a deep navy void, soft painterly shading, clean geometric shapes, single island centered in frame, seen from a high three-quarter angle, cinematic rim light, empty plain dark navy sky with no stars, no symbols, no crosses, no particles, no text, no letters, no logos, no people, no watermark",
+  "stages": {
+    "0": "in darkness and disrepair: bare stone foundations, dashed scaffolding outlines of unbuilt structures, thin fog, everything unlit except one faint {accent} lamp",
+    "1": "half built: some structures complete with {accent} windows glowing, cranes and scaffolding on the rest, a few beacons on, sparks of construction light",
+    "2": "fully built and operational: every structure complete, all windows and beacons glowing {accent}, small drones with {accent} lights hovering, light trails, vibrant and alive"
+  },
+  "worlds": {
+    "foundation-district": {
+      "accent": "cyan",
+      "subject": "a founding settlement with a central power core reactor, low habitation blocks, a tall comms tower with a dish, and a large district sign"
+    },
+    "data-vault": {
+      "accent": "violet",
+      "subject": "a fortified data vault: a heavy domed archive building, rows of glass storage racks, a slender index spire, conveyor tubes carrying glowing data capsules, a translucent integrity shield dome"
+    },
+    "logic-gate": {
+      "accent": "amber",
+      "subject": "a fortified checkpoint plaza: a great arched gate with barrier lights, decision beacon pillars, a large policy board sign, a translucent risk shield over the gate"
+    },
+    "drone-fleet": {
+      "accent": "emerald",
+      "subject": "a drone airfield: circular launch pads, open hangar bays, a tall control tower, marked patrol lanes, a swarm of small quadcopter drones"
+    },
+    "automation-factory": {
+      "accent": "rose",
+      "subject": "an automation factory: long assembly halls, conveyor lines with moving crates, robotic worker drones, a tall factory stack, floodlit factory floor"
+    },
+    "resilience-reactor": {
+      "accent": "orange",
+      "subject": "a hardened reactor complex: a containment dome, redundant cooling towers, blast walls, emergency floodlights, a fallback generator yard"
+    },
+    "archive-core": {
+      "accent": "sky",
+      "subject": "a vast archive library: stacked record halls, a central vault door, catalog towers, pneumatic tube lines, a restoration crane"
+    },
+    "network-district": {
+      "accent": "cyan",
+      "subject": "a network hub: relay antenna masts, a satellite uplink dish, fiber conduit bridges between towers, a routing exchange building"
+    },
+    "architect-lab": {
+      "accent": "violet",
+      "subject": "a design laboratory: a glass atrium studio, blueprint drafting halls, prototype pods, a model workshop with cranes"
+    },
+    "runtime-grid": {
+      "accent": "amber",
+      "subject": "a power and compute grid: rows of server halls, transformer yards, cable trunks, a dispatch control building, grid substations"
+    },
+    "concurrent-city": {
+      "accent": "emerald",
+      "subject": "a busy transit city: elevated rail loops, multiple tram lines crossing, traffic signal towers, parallel platforms, streams of vehicles"
+    },
+    "service-hub": {
+      "accent": "rose",
+      "subject": "a service terminal: an arrivals hall with gates, ticket kiosks, a validation checkpoint, dispatch counters, a tall status board"
+    },
+    "deployment-yard": {
+      "accent": "orange",
+      "subject": "a shipping deployment yard: stacked containers, a gantry crane, a launch ramp, loading docks, a versioning control tower"
+    },
+    "intelligence-core": {
+      "accent": "sky",
+      "subject": "an intelligence core: a crystalline central brain structure, orbiting rings, prompt console pavilions, thought-light conduits"
+    },
+    "memory-engine": {
+      "accent": "cyan",
+      "subject": "a memory engine: a great index tower, retrieval galleries with glowing shelves, embedding pools of light, citation bridges"
+    },
+    "autonomous-command": {
+      "accent": "violet",
+      "subject": "an autonomous command citadel: a central command spire, tool docks, guardrail walls, an evaluation observatory dome, beacon lights"
+    }
+  }
+}

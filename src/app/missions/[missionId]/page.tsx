@@ -45,6 +45,9 @@ export default async function MissionPage({ params }: PageProps<"/missions/[miss
       skills={view.skills}
       primers={view.primers}
       checks={view.checks}
+      art={view.art}
+      operationalPct={view.operationalPct}
+      worldLayers={view.worldLayers}
     />
   );
 }

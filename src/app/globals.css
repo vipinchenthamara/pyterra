@@ -48,6 +48,7 @@
   --animate-scan: scan 6s linear infinite;
   --animate-flow: flow 2.4s linear infinite;
   --animate-blink: blink 1.6s steps(2, start) infinite;
+  --animate-sweep: sweep 1.4s ease-out 1;
 
   @keyframes pulse-slow {
     0%, 100% { opacity: 0.55; }
@@ -67,6 +68,10 @@
   }
   @keyframes blink {
     to { visibility: hidden; }
+  }
+  @keyframes sweep {
+    from { transform: translateX(-120%); }
+    to { transform: translateX(400%); }
   }
 }
 

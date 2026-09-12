@@ -2,7 +2,8 @@ import Link from "next/link";
 import { Suspense } from "react";
 import { ArrowRight } from "lucide-react";
 import { getSnapshot } from "@/server/state";
-import { WorldMap } from "@/components/dashboard/WorldMap";
+import { Atlas } from "@/components/dashboard/Atlas";
+import { artForWorld } from "@/server/art";
 import { SessionSelector } from "@/components/dashboard/SessionSelector";
 import { Briefing } from "@/components/dashboard/Briefing";
 import { SkillHealth } from "@/components/dashboard/SkillHealth";
@@ -18,7 +19,7 @@ export default async function Home({ searchParams }: PageProps<"/">) {
   const sp = await searchParams;
   const session = Number(sp.session) || undefined;
   const snapshot = getSnapshot({ sessionMinutes: session });
-  const nodes = snapshot.worlds.map((w) => ({ id: w.world.id, order: w.world.order, name: w.world.name, codename: w.world.codename, pct: w.computed.operationalPct, visual: w.visual, accent: w.world.accent }));
+  const tiles = snapshot.worlds.map((w) => ({ world: { id: w.world.id, name: w.world.name, accent: w.world.accent, scene: w.world.scene, codename: w.world.codename, order: w.world.order }, art: artForWorld(w.world.id), pct: w.computed.operationalPct, layers: w.computed.layers, visual: w.visual }));
   const next = snapshot.next;
   const current = snapshot.profile.lastWorldId ?? next?.mission.worldId ?? null;
 
@@ -65,7 +66,7 @@ export default async function Home({ searchParams }: PageProps<"/">) {
             <p className="mt-6 font-display text-[12.5px] italic text-fg-3">“Code turns ideas into worlds.” — You</p>
           </div>
           <div className="min-w-0 flex-1">
-            <WorldMap nodes={nodes} currentId={current} />
+            <Atlas tiles={tiles} currentId={current} />
           </div>
         </div>
       </section>

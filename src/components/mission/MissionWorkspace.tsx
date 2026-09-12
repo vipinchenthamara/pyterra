@@ -19,6 +19,7 @@ import { ErrorCoachCard } from "./ErrorCoachCard";
 import { CompletionOverlay } from "./CompletionOverlay";
 import { BriefStep } from "./BriefStep";
 import { PrimerStep, type PrimerView } from "./PrimerStep";
+import { ArtScene } from "@/components/world/ArtScene";
 
 export interface WorkspaceProps {
   mission: ClientMission;
@@ -34,6 +35,9 @@ export interface WorkspaceProps {
   primers: PrimerView[];
   /** Visible test names (docstrings), in order. */
   checks: string[];
+  art: { stages: string[] } | null;
+  operationalPct: number;
+  worldLayers: Record<string, number>;
 }
 
 interface Attempt {
@@ -288,6 +292,18 @@ export function MissionWorkspace(p: WorkspaceProps) {
 
           {/* Right rail: one thing at a time */}
           <div className="flex flex-col gap-3">
+            <div className="panel overflow-hidden !p-0">
+              <div className="relative aspect-[16/9] w-full">
+                <ArtScene world={p.world} art={p.art} operationalPct={p.operationalPct} layers={p.worldLayers} compact className="h-full w-full" />
+                <div className="absolute inset-x-0 bottom-0 flex items-end justify-between bg-gradient-to-t from-bg-deep/90 to-transparent px-3 pb-2 pt-8">
+                  <span className="font-display text-[13px] font-semibold text-fg">{p.world.name}</span>
+                  <span className="readout text-[11px] text-cyan">{p.operationalPct}% operational</span>
+                </div>
+              </div>
+              <div className="px-3 py-2 text-[12px] text-fg-3">
+                Passing this mission builds: {p.mission.onComplete.filter((d) => d.kind === "layer").map((d) => (d.kind === "layer" ? p.world.scene.layers.find((l) => l.id === d.layer)?.label ?? d.layer : "")).join(", ") || "district systems"}.
+              </div>
+            </div>
             {coached && <ErrorCoachCard coached={coached} onAskTutor={() => document.querySelector<HTMLButtonElement>('[aria-label="Open teaching assistant"]')?.click()} />}
             <div className="panel flex flex-col !p-0">
               <div className="flex border-b border-line" role="tablist" aria-label="Help">
@@ -364,7 +380,7 @@ export function MissionWorkspace(p: WorkspaceProps) {
         </div>
       )}
 
-      {completion && <CompletionOverlay result={completion} mission={p.mission} world={p.world} artifactNames={p.artifactNames} reviewMode={isReview} onClose={() => setCompletion(null)} />}
+      {completion && <CompletionOverlay result={completion} mission={p.mission} world={p.world} art={p.art} artifactNames={p.artifactNames} reviewMode={isReview} onClose={() => setCompletion(null)} />}
     </div>
   );
 }

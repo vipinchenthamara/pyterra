@@ -7,10 +7,10 @@ import { ArrowRight, Trophy, Boxes, Sparkles } from "lucide-react";
 import type { CompletionResult } from "@/server/complete";
 import type { ClientMission, World } from "@content/schema";
 import { Button, Badge } from "@/components/ui";
-import { WorldScene } from "@/components/world/WorldScene";
+import { ArtScene } from "@/components/world/ArtScene";
 import { cn } from "@/lib/cn";
 
-export function CompletionOverlay({ result, mission, world, artifactNames, onClose, reviewMode }: { result: CompletionResult; mission: ClientMission; world: Pick<World, "id" | "name" | "accent" | "scene">; artifactNames: Record<string, string>; onClose: () => void; reviewMode: boolean }) {
+export function CompletionOverlay({ result, mission, world, art, artifactNames, onClose, reviewMode }: { result: CompletionResult; mission: ClientMission; world: Pick<World, "id" | "name" | "accent" | "scene">; art: { stages: string[] } | null; artifactNames: Record<string, string>; onClose: () => void; reviewMode: boolean }) {
   const [choice, setChoice] = useState<number | null>(null);
   const ew = mission.explainWhy;
   const nextHref = result.nextMissionId ? `/missions/${result.nextMissionId}` : result.worldUnlocked ? `/worlds/${result.worldUnlocked}` : `/worlds/${world.id}`;
@@ -20,7 +20,7 @@ export function CompletionOverlay({ result, mission, world, artifactNames, onClo
       <motion.div initial={{ opacity: 0, y: 24, scale: 0.98 }} animate={{ opacity: 1, y: 0, scale: 1 }} transition={{ duration: 0.45, ease: [0.2, 0.8, 0.2, 1] }} className="panel hud w-full max-w-4xl overflow-hidden !p-0">
         <div className="grid grid-cols-1 md:grid-cols-[minmax(0,1.15fr)_minmax(0,1fr)]">
           <div className="relative min-h-[260px] bg-bg-deep">
-            <WorldScene world={world} layers={result.worldAfter.layers} previousLayers={result.worldBefore.layers} className="h-full w-full" showLabels={false} />
+            <ArtScene world={world} art={art} operationalPct={result.worldAfter.operationalPct} layers={result.worldAfter.layers} previousLayers={result.worldBefore.layers} className="h-full w-full" />
             <div className="absolute left-4 top-4 flex items-center gap-2">
               <Badge tone="cyan">{world.name}</Badge>
               <span className="readout text-[12px] text-fg-2">

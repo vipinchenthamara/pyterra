@@ -4,7 +4,8 @@ import { Clock, Target, Boxes, BookOpen } from "lucide-react";
 import { getSkill, getWorld, missionsForWorld } from "@content/registry";
 import { getSnapshot } from "@/server/state";
 import * as repo from "@/db/repos";
-import { WorldScene } from "@/components/world/WorldScene";
+import { ArtScene } from "@/components/world/ArtScene";
+import { artForWorld } from "@/server/art";
 import { EnterDistrictButton } from "@/components/world/EnterDistrictButton";
 import { Badge, type Tone } from "@/components/ui";
 
@@ -29,14 +30,15 @@ export default async function ArrivePage({ params }: PageProps<"/worlds/[worldId
   const totalMinutes = missions.reduce((a, m) => a + m.estimatedMinutes, 0);
   const tone = ACCENT_TONE[world.accent] ?? "cyan";
   const locked = !wv.computed.unlocked;
+  const art = artForWorld(world.id);
 
   return (
     <div className="mx-auto flex max-w-[1100px] flex-col gap-6">
       <Link href="/worlds" className="font-mono text-[11.5px] uppercase tracking-wider text-fg-3 hover:text-cyan">‹ Worlds</Link>
 
       <section className="panel hud overflow-hidden !p-0">
-        <div className="relative aspect-[21/9] w-full bg-bg-deep">
-          <WorldScene world={world} layers={wv.computed.layers} locked={locked} className="h-full w-full" />
+        <div className="relative aspect-[2/1] w-full bg-bg-deep">
+          <ArtScene world={world} art={art} operationalPct={wv.computed.operationalPct} layers={wv.computed.layers} locked={locked} parallax className="h-full w-full" />
           <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-panel to-transparent px-8 pb-5 pt-16">
             <div className="flex items-center gap-2">
               <Badge tone={tone}>{world.codename}</Badge>
