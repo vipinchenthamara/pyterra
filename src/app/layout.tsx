@@ -11,7 +11,7 @@ const plex = IBM_Plex_Sans({ variable: "--font-plex", subsets: ["latin"], weight
 const jet = JetBrains_Mono({ variable: "--font-jet", subsets: ["latin"], weight: ["400", "500", "600"] });
 
 export const metadata: Metadata = {
-  title: "Architect Online",
+  title: "Pyterra",
   description: "Build worlds. Learn Python. Create what's next.",
 };
 

@@ -1,8 +1,8 @@
-# Architect Online — Design Spec (Milestone 1)
+# Pyterra — Design Spec (Milestone 1)
 
 ## Context
 
-Vipin is training to become a Forward Deployed Engineer and needs Python fluency, starting from zero. He does not want a conventional LMS (read → example → progress bar). He wrote a PRD (`~/Downloads/Architect_Online_Product_Requirements_Document.docx`) and mockups for **Architect Online**: a personal, game-based learning site where each Python module is a *world* that starts as empty land and is physically built up by the code he writes. A Claude-branded teaching assistant sits in the bottom-right corner, tracks what he's doing, and answers doubts without spoiling solutions.
+Vipin is training to become a Forward Deployed Engineer and needs Python fluency, starting from zero. He does not want a conventional LMS (read → example → progress bar). He wrote a PRD (`~/Downloads/Architect_Online_Product_Requirements_Document.docx`) and mockups for **Pyterra**: a personal, game-based learning site where each Python module is a *world* that starts as empty land and is physically built up by the code he writes. A Claude-branded teaching assistant sits in the bottom-right corner, tracks what he's doing, and answers doubts without spoiling solutions.
 
 This is a greenfield project for personal use. Decisions locked with the user:
 

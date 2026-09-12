@@ -22,7 +22,7 @@ export function Sidebar() {
       <div className="flex items-center gap-3 px-5 pb-4 pt-6">
         <Logo className="h-9 w-9" />
         <div className="leading-tight">
-          <div className="font-display text-[15px] font-semibold tracking-wide">Architect Online</div>
+          <div className="font-display text-[15px] font-semibold tracking-wide">Pyterra</div>
           <div className="label mt-0.5 !text-[0.6rem]">Python · FDE track</div>
         </div>
       </div>

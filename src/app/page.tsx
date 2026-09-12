@@ -30,7 +30,7 @@ export default async function Home({ searchParams }: PageProps<"/">) {
         <div className="relative z-10 flex flex-col gap-6 lg:flex-row lg:items-start">
           <div className="max-w-md shrink-0">
             <h1 className="font-display text-[34px] font-semibold leading-[1.05] tracking-wide">
-              Architect Online.
+              Pyterra.
               <br />
               <span className="text-fg-2">Your world is </span>
               <span className="glow-cyan text-cyan">{snapshot.overallPct}%</span>

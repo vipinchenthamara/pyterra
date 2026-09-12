@@ -1,5 +1,5 @@
 """
-Architect Online test harness. Loaded once into the Pyodide runtime (browser worker or Node tests).
+Pyterra test harness. Loaded once into the Pyodide runtime (browser worker or Node tests).
 
 run_job(code, visible_src, hidden_src) -> JSON string:
 {

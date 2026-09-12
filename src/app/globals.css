@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 /*
- * Architect Online design tokens (Tailwind 4: CSS-first config, no tailwind.config.js).
+ * Pyterra design tokens (Tailwind 4: CSS-first config, no tailwind.config.js).
  * Usage: bg-bg, text-fg, border-line, text-cyan, bg-panel, font-display, font-mono ...
  * Accents: cyan = active/complete, violet = locked/mystery, amber = unstable/repair, emerald = stable.
  */

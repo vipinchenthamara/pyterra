@@ -1,4 +1,4 @@
-/* Architect Online — Pyodide runner worker (ES module worker, served from public/, not bundled).
+/* Pyterra — Pyodide runner worker (ES module worker, served from public/, not bundled).
  * Protocol: see src/engine/runner/protocol.ts. Timeouts are enforced by the client
  * (terminate + respawn); this worker only executes and streams output. */
 var PYODIDE_INDEX = self.location.origin + "/py/vendor/";

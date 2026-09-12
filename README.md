@@ -1,6 +1,6 @@
-# Architect Online
+# Pyterra
 
-A personal, world-based Python learning environment. You do not complete chapters. You restore, expand and
+Pyterra: a personal, world-based Python learning environment. You do not complete chapters. You restore, expand and
 upgrade sixteen districts by writing Python, and a Claude-powered teaching assistant helps without spoiling.
 
 ## Run it
