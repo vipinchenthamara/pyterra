@@ -4,15 +4,15 @@ import { skills } from "../../skills";
 import { previewWorlds } from "./index";
 
 const AUTHORED_WORLD_IDS = ["foundation-district", "data-vault"];
-const EXPECTED_ORDERS = Array.from({ length: 14 }, (_, i) => i + 3);
+const EXPECTED_ORDERS = Array.from({ length: 11 }, (_, i) => i + 6);
 
 const parsed: World[] = previewWorlds.map((p) => WorldSchema.parse(p.world));
 const previewIds = new Set(parsed.map((w) => w.id));
 const skillIds = new Set(skills.map((s) => s.id));
 
-describe("preview worlds (3–16)", () => {
+describe("preview worlds (6–16)", () => {
   it("contains 14 packs, each locked-preview with no missions and no artifacts", () => {
-    expect(previewWorlds).toHaveLength(14);
+    expect(previewWorlds).toHaveLength(11);
     for (const p of previewWorlds) {
       expect(p.missions).toEqual([]);
       expect(p.world.status).toBe("locked-preview");
@@ -25,16 +25,16 @@ describe("preview worlds (3–16)", () => {
       const r = WorldSchema.safeParse(p.world);
       expect(r.success, `world "${p.world.id}": ${JSON.stringify(r.success ? null : r.error.issues)}`).toBe(true);
     }
-    expect(parsed).toHaveLength(14);
+    expect(parsed).toHaveLength(11);
   });
 
-  it("orders are exactly 3..16 in sequence", () => {
+  it("orders are exactly 6..16 in sequence", () => {
     expect(parsed.map((w) => w.order)).toEqual(EXPECTED_ORDERS);
   });
 
   it("world ids and codenames are unique and codenames match order", () => {
-    expect(previewIds.size).toBe(14);
-    expect(new Set(parsed.map((w) => w.codename)).size).toBe(14);
+    expect(previewIds.size).toBe(11);
+    expect(new Set(parsed.map((w) => w.codename)).size).toBe(11);
     for (const w of parsed) expect(w.codename).toBe(`W${w.order}`);
   });
 
@@ -67,8 +67,8 @@ describe("preview worlds (3–16)", () => {
 
   it("unlock chain is linear: world N is unlocked by world N-1", () => {
     const byOrder = new Map(parsed.map((w) => [w.order, w]));
-    expect(byOrder.get(3)?.unlockedBy).toEqual(["data-vault"]);
-    for (let order = 4; order <= 16; order++) {
+    expect(byOrder.get(6)?.unlockedBy).toEqual(["automation-factory"]);
+    for (let order = 7; order <= 16; order++) {
       expect(byOrder.get(order)?.unlockedBy).toEqual([byOrder.get(order - 1)?.id]);
     }
   });
@@ -80,7 +80,7 @@ describe("preview worlds (3–16)", () => {
   });
 
   it("taglines are distinct and arrival scenes are prose, not definitions", () => {
-    expect(new Set(parsed.map((w) => w.tagline)).size).toBe(14);
+    expect(new Set(parsed.map((w) => w.tagline)).size).toBe(11);
     for (const w of parsed) {
       expect(w.tagline.split(/\s+/).length, `tagline length in "${w.id}"`).toBeLessThanOrEqual(6);
       expect(w.arrivalScene.split(/[.!?]\s/).length, `arrivalScene sentences in "${w.id}"`).toBeGreaterThanOrEqual(2);

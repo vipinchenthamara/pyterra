@@ -30,6 +30,12 @@ describe.each(missions.map((m) => [m.id, m] as const))("mission %s", (_id, m) =>
     expect(failures, failures.join("\n")).toEqual([]);
     expect(r.passed).toBe(true);
   });
+  it("review variant reference solution passes its own tests", () => {
+    if (!m.reviewVariant) return;
+    const r = run(m.reviewVariant.referenceSolution, m.reviewVariant.tests);
+    expect(r.passed, r.hidden.firstFailure ?? r.error ?? "").toBe(true);
+    expect(run(m.reviewVariant.starterCode, m.reviewVariant.tests).passed).toBe(false);
+  });
   it("hint ladder and tests describe behaviour, not literal answers", () => {
     expect(m.hints.length).toBe(6);
     for (const [i, h] of m.hints.entries()) expect(h.length, `hint ${i + 1}`).toBeGreaterThan(20);

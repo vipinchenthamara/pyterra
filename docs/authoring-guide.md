@@ -41,12 +41,35 @@ Deployed Engineer. Frame every example in security / cloud / ops / AI terms. Nev
   scaffolding, `difficulty` 4–5, hints still 6 but the first three stay conceptual.
 
 ## Python level
-Only use what the world (and earlier worlds) teach. World 1 has no lists, no loops, no functions, no if.
-World 2 may use everything from World 1 plus lists/sets/dicts/tuples, `len`, `in`, `sorted`, `.count()`,
-`.items()`, `min`/`max`, and simple `for` loops ONLY where unavoidable in tests (never required of the learner —
-loops are World 4). Missions in World 2 that need iteration should be written so `in`, `set()`, `dict` lookups,
-`len`, `sorted` and slicing suffice for the learner.
+Only use what the world (and earlier worlds) teach. Cumulative ladder:
+- World 1 (Foundation District): variables, int/float/bool, arithmetic, strings, f-strings, slicing, int()/str()/float(). No lists, loops, functions or if.
+- World 2 (Data Vault): + lists, sets, dicts, tuples, `len`, `in`, `sorted`, `.count()`, `.items()`, `min`/`max`, the simple `def name(args): return ...` pattern. No loops, no if.
+- World 3 (Logic Gate): + `if` / `elif` / `else`, comparison operators, `and` / `or` / `not`, truthiness, `is None`, nested conditions. Still no loops or comprehensions.
+- World 4 (Drone Fleet): + `for` over lists/ranges/dict items, `while`, `break`, `continue`, `range`, `enumerate`, accumulators, list/set/dict comprehensions.
+- World 5 (Automation Factory): + full functions: parameters, defaults, keyword args, return values incl. tuples, scope, functions calling functions, `*args` (light).
+Tests may use anything. The learner's required code must stay inside the ladder for that world.
+
+## Review variants (required on every mission)
+Spaced review must "reuse the concept in a new context rather than repeat the same question" (PRD §11).
+Every mission carries a `reviewVariant` with `briefing`, `objective`, `starterCode`, `referenceSolution`, `tests`:
+- Same primary skill, DIFFERENT scenario, function/variable names and data. Not a rename of the original.
+- Slightly smaller than the mission (2–4 minutes): the learner rebuilds the idea from memory.
+- `starterCode` is a thin scaffold (comments + a signature or the data), must not already pass.
+- `objective` and `tests.hidden` must differ from the mission's. Verified by the pack test.
+Example (for Duplicate Incident, whose skill is sets):
+```ts
+reviewVariant: {
+  briefing: "The identity provider logs every login attempt. Ops wants to know which distinct usernames tried to sign in during the incident window, not how many times each tried.",
+  objective: "Write a function `distinct_users(attempts)` that takes a list of usernames and returns a set containing each username once.",
+  starterCode: "def distinct_users(attempts):\n    # return a SET of the distinct usernames\n    ...\n",
+  referenceSolution: "def distinct_users(attempts):\n    return set(attempts)\n",
+  tests: {
+    visible: `\ndef test_distinct():\n    "Each username appears once"\n    out = solution.distinct_users(["ana", "bo", "ana"])\n    check(out == {"ana", "bo"}, "Each username should appear exactly once")\n`,
+    hidden: `\ndef test_is_set():\n    check(isinstance(solution.distinct_users(["x"]), set), "The result should be a set")\ndef test_empty():\n    check(solution.distinct_users([]) == set(), "No attempts means no users")\n`,
+  },
+},
+```
 
 ## Verify
 `npx vitest run content/worlds/<world>` runs the pack test: schema, references, starter/solution execution in
-real Pyodide. All green before you finish.
+real Pyodide, and the review variant. All green before you finish.

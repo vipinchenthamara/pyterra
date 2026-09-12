@@ -1,91 +1,11 @@
 /**
- * Locked preview worlds 3–16 (PRD world sequence). Each pack carries authored world metadata
+ * Locked preview worlds 6–16 (PRD world sequence). Each pack carries authored world metadata
  * but no missions yet; the registry allows `locked-preview` worlds to have zero missions.
  * Artifacts are intentionally empty: an artifact must be unlocked by at least one mission.
  * When a world is authored, move it to its own folder and replace the entry here.
  */
 import type { WorldPack } from "../../registry";
 import type { WorldInput } from "../../schema";
-
-const logicGate: WorldInput = {
-  id: "logic-gate",
-  order: 3,
-  name: "Logic Gate",
-  codename: "W3",
-  tagline: "Decide who gets through.",
-  arrivalScene:
-    "The Vault is full of records, but the gates in front of it open for anyone who asks. A contractor badge and an admin badge get the same answer, and a request at 03:00 from an unknown region looks identical to one from the ops floor. The district needs rules that weigh role, time, risk and location before a single door moves.",
-  builds: "An Access Control Engine: access-control rules and risk decisions for every gate in the district.",
-  quote: "A gate without a rule is just a hole in the wall.",
-  accent: "amber",
-  status: "locked-preview",
-  unlockedBy: ["data-vault"],
-  skillIds: ["conditions", "boolean-logic"],
-  scene: {
-    layers: [
-      { id: "gate-plaza", kind: "ground", label: "Gate plaza", maxLevel: 1 },
-      { id: "checkpoint-arch", kind: "building", label: "Checkpoint arch", maxLevel: 2 },
-      { id: "decision-beacons", kind: "light", label: "Decision beacons", maxLevel: 2 },
-      { id: "policy-board", kind: "sign", label: "Policy board", maxLevel: 1 },
-      { id: "risk-shield", kind: "shield", label: "Risk shield", maxLevel: 2 },
-    ],
-  },
-  artifacts: [],
-};
-
-const droneFleet: WorldInput = {
-  id: "drone-fleet",
-  order: 4,
-  name: "Drone Fleet",
-  codename: "W4",
-  tagline: "Repeat it without the toil.",
-  arrivalScene:
-    "Two hundred patrol drones sit on the pads, and every one of them needs a battery check, a firmware audit and a route assignment before dawn. Right now an operator does it by hand, one drone at a time, and gives up around number forty. The fleet only flies if the same operation can run across all of them and keep running until the last pad is clear.",
-  builds: "Automated fleet operations: batch battery audits, firmware sweeps and route assignment across the whole fleet.",
-  quote: "If you did it twice, the machine should do it the third time.",
-  accent: "emerald",
-  status: "locked-preview",
-  unlockedBy: ["logic-gate"],
-  skillIds: ["for-loops", "while-loops", "comprehensions"],
-  scene: {
-    layers: [
-      { id: "launch-pads", kind: "ground", label: "Launch pads", maxLevel: 1 },
-      { id: "hangar-bays", kind: "building", label: "Hangar bays", maxLevel: 2 },
-      { id: "drone-swarm", kind: "drone", label: "Drone swarm", maxLevel: 2 },
-      { id: "control-tower", kind: "spire", label: "Control tower", maxLevel: 2 },
-      { id: "patrol-lanes", kind: "dataflow", label: "Patrol lanes", maxLevel: 2 },
-      { id: "pad-lights", kind: "light", label: "Pad lighting", maxLevel: 1 },
-    ],
-  },
-  artifacts: [],
-};
-
-const automationFactory: WorldInput = {
-  id: "automation-factory",
-  order: 5,
-  name: "Automation Factory",
-  codename: "W5",
-  tagline: "Build the machine once.",
-  arrivalScene:
-    "The fleet scripts work, but the same forty lines are pasted into six different runbooks, and last week someone fixed a threshold in five of them. Every team asks for a slightly different version: another region, a stricter limit, a dry run. The factory needs machines that take inputs, do one job well, and hand back a result anyone can reuse.",
-  builds: "An Automation Script: reusable, parameterised machines that replace copy-pasted operational runbooks.",
-  quote: "Copy-paste is a promise you will forget to keep.",
-  accent: "rose",
-  status: "locked-preview",
-  unlockedBy: ["drone-fleet"],
-  skillIds: ["functions", "arguments"],
-  scene: {
-    layers: [
-      { id: "factory-floor", kind: "ground", label: "Factory floor", maxLevel: 1 },
-      { id: "assembly-halls", kind: "building", label: "Assembly halls", maxLevel: 2 },
-      { id: "conveyor-lines", kind: "dataflow", label: "Conveyor lines", maxLevel: 2 },
-      { id: "worker-drones", kind: "drone", label: "Worker drones", maxLevel: 2 },
-      { id: "factory-stack", kind: "spire", label: "Factory stack", maxLevel: 1 },
-      { id: "floor-lights", kind: "light", label: "Floor lighting", maxLevel: 2 },
-    ],
-  },
-  artifacts: [],
-};
 
 const resilienceReactor: WorldInput = {
   id: "resilience-reactor",
@@ -380,11 +300,8 @@ const autonomousCommand: WorldInput = {
   artifacts: [],
 };
 
-/** Worlds 3–16, in PRD order. Every pack is a locked preview with no missions yet. */
+/** Worlds 6–16, in PRD order. Every pack is a locked preview with no missions yet. */
 export const previewWorlds: WorldPack[] = [
-  logicGate,
-  droneFleet,
-  automationFactory,
   resilienceReactor,
   archiveCore,
   networkDistrict,

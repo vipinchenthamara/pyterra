@@ -47,8 +47,8 @@ const REVIEW_SCAFFOLD = (m: ClientMission) => `# REPAIR MISSION — rebuild from
 
 export function MissionWorkspace(p: WorkspaceProps) {
   const isReview = p.mode === "review";
-  const starter = isReview ? REVIEW_SCAFFOLD(p.mission) : p.mission.starterCode;
-  const [code, setCode] = useState(isReview ? starter : p.initialCode);
+  const starter = isReview ? (p.initialCode || REVIEW_SCAFFOLD(p.mission)) : p.mission.starterCode;
+  const [code, setCode] = useState(starter);
   const [attempt, setAttempt] = useState<Attempt | null>(null);
   const [outcome, setOutcome] = useState<RunOutcome | null>(null);
   const [coached, setCoached] = useState<CoachedError | null>(null);

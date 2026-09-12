@@ -5,10 +5,13 @@ describe("content registry", () => {
   it("validates without errors", () => {
     expect(() => validateRegistry()).not.toThrow();
   });
-  it("has 16 worlds in order with worlds 1–2 authored", () => {
+  it("has 16 worlds in order with worlds 1–5 authored", () => {
     expect(worlds.map((w) => w.order)).toEqual(Array.from({ length: 16 }, (_, i) => i + 1));
-    expect(worlds[0].status).toBe("authored");
-    expect(worlds[1].status).toBe("authored");
+    for (let i = 0; i < 5; i++) expect(worlds[i].status, worlds[i].id).toBe("authored");
+    for (let i = 5; i < 16; i++) expect(worlds[i].status, worlds[i].id).toBe("locked-preview");
+  });
+  it("every authored mission has a review variant", () => {
+    for (const m of missions) expect(m.reviewVariant, `${m.id} lacks reviewVariant`).toBeDefined();
   });
   it("authored worlds have 5 missions and a boss", () => {
     for (const w of worlds.filter((w) => w.status === "authored")) {

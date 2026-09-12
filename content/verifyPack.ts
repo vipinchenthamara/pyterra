@@ -72,6 +72,22 @@ export function describePack(pack: WorldPack) {
         expect(r.executed, r.error ?? "").toBe(true);
         expect(failures, failures.join("\n")).toEqual([]);
       });
+      it("review variant (if authored) is a fresh context whose reference passes and starter fails", () => {
+        if (!m?.reviewVariant) return;
+        const v = m.reviewVariant;
+        expect(v.objective).not.toBe(m.objective);
+        expect(v.tests.hidden).not.toBe(m.tests.hidden);
+        const bad = run(v.starterCode, v.tests);
+        expect(bad.errorType, bad.error ?? "").not.toBe("SyntaxError");
+        expect(bad.passed, "variant starter must not already pass").toBe(false);
+        const good = run(v.referenceSolution, v.tests);
+        const failures = good.visible.filter((t) => t.status !== "pass").map((t) => `${t.id}: ${t.message}`);
+        if (good.hidden.firstFailure) failures.push(`hidden: ${good.hidden.firstFailure}`);
+        expect(good.executed, good.error ?? "").toBe(true);
+        expect(failures, failures.join("\n")).toEqual([]);
+        expect(v.tests.visible).toMatch(/def test_/);
+        expect(v.tests.hidden).toMatch(/def test_/);
+      });
       it("tests never leak literal expected values in their messages", () => {
         if (!m) return;
         expect(m.hints.length).toBe(6);

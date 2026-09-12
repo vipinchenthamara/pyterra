@@ -149,6 +149,16 @@ export const ErrorExplanationSchema = z.object({
   explanation: z.string().min(1),
 });
 
+/** A fresh-context re-run of the mission used by spaced review (PRD §11: reuse the concept, not the question). */
+export const ReviewVariantSchema = z.object({
+  briefing: z.string().min(1),
+  objective: z.string().min(1),
+  starterCode: z.string().min(1),
+  /** Tutor-only. Never sent to the browser. */
+  referenceSolution: z.string().min(1),
+  tests: TestSuiteSchema,
+});
+
 export const ExplainWhySchema = z.object({
   question: z.string().min(1),
   options: z.array(z.string().min(1)).min(2).max(4),
@@ -189,6 +199,7 @@ export const MissionSchema = z.object({
   /** Skill ids whose anchors are shown in the Concept card. */
   anchors: z.array(Id).default([]),
   explainWhy: ExplainWhySchema.optional(),
+  reviewVariant: ReviewVariantSchema.optional(),
   timeoutMs: z.number().int().min(500).max(30000).default(5000),
   onComplete: z.array(WorldStateDeltaSchema).min(1),
   /** Artifact ids (declared on the world) this mission contributes to. */
@@ -210,12 +221,20 @@ export type MissionKindT = z.infer<typeof MissionKind>;
 export type WorldStateDelta = z.infer<typeof WorldStateDeltaSchema>;
 export type HintLadder = z.infer<typeof HintLadderSchema>;
 export type ErrorExplanation = z.infer<typeof ErrorExplanationSchema>;
+export type ReviewVariant = z.infer<typeof ReviewVariantSchema>;
 
-/** Mission shape that is safe to send to the browser (no reference solution). */
-export type ClientMission = Omit<Mission, "referenceSolution">;
+/** Mission shape that is safe to send to the browser (no reference solutions). */
+export type ClientMission = Omit<Mission, "referenceSolution" | "reviewVariant"> & { hasReviewVariant: boolean };
 
 export function toClientMission(m: Mission): ClientMission {
-  const { referenceSolution: _omit, ...rest } = m;
+  const { referenceSolution: _omit, reviewVariant, ...rest } = m;
   void _omit;
-  return rest;
+  return { ...rest, hasReviewVariant: !!reviewVariant };
+}
+
+/** The mission as the learner sees it during a review: variant fields swapped in when authored. */
+export function toReviewMission(m: Mission): Mission {
+  if (!m.reviewVariant) return m;
+  const v = m.reviewVariant;
+  return { ...m, briefing: v.briefing, objective: v.objective, starterCode: v.starterCode, referenceSolution: v.referenceSolution, tests: v.tests };
 }
