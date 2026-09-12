@@ -3,7 +3,7 @@ import { WorldSchema, type World } from "../../schema";
 import { skills } from "../../skills";
 import { previewWorlds } from "./index";
 
-const AUTHORED_WORLD_IDS = ["foundation-district", "data-vault"];
+const AUTHORED_WORLD_IDS = ["foundation-district", "data-vault", "logic-gate", "drone-fleet", "automation-factory"];
 const EXPECTED_ORDERS = Array.from({ length: 11 }, (_, i) => i + 6);
 
 const parsed: World[] = previewWorlds.map((p) => WorldSchema.parse(p.world));
