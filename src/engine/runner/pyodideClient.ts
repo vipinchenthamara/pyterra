@@ -27,7 +27,9 @@ class PyodideClient {
   }
   subscribe(fn: Listener) {
     this.listeners.add(fn);
-    return () => this.listeners.delete(fn);
+    return () => {
+      this.listeners.delete(fn);
+    };
   }
   private setStatus(s: RunnerStatus) {
     this.status = s;

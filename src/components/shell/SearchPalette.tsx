@@ -34,12 +34,20 @@ export function SearchPalette({ open, onClose }: { open: boolean; onClose: () =>
 
   useEffect(() => {
     if (!open) return;
-    setQ("");
-    setCursor(0);
-    setTimeout(() => inputRef.current?.focus(), 10);
+    const t = setTimeout(() => inputRef.current?.focus(), 10);
+    let cancelled = false;
     if (entries.length === 0) {
-      fetch("/api/search").then((r) => r.json()).then(setEntries).catch(() => {});
+      fetch("/api/search")
+        .then((r) => r.json())
+        .then((data) => {
+          if (!cancelled) setEntries(data);
+        })
+        .catch(() => {});
     }
+    return () => {
+      cancelled = true;
+      clearTimeout(t);
+    };
   }, [open, entries.length]);
 
   const results = useMemo(() => {
@@ -52,11 +60,12 @@ export function SearchPalette({ open, onClose }: { open: boolean; onClose: () =>
       .map((x) => x.e);
   }, [q, entries]);
 
-  useEffect(() => setCursor(0), [results.length]);
+  const safeCursor = Math.min(cursor, Math.max(0, results.length - 1));
 
   if (!open) return null;
   const go = (e: SearchEntry) => {
     onClose();
+    setQ("");
     router.push(e.href);
   };
   return (
@@ -65,12 +74,18 @@ export function SearchPalette({ open, onClose }: { open: boolean; onClose: () =>
         <input
           ref={inputRef}
           value={q}
-          onChange={(e) => setQ(e.target.value)}
+          onChange={(e) => {
+            setQ(e.target.value);
+            setCursor(0);
+          }}
           onKeyDown={(e) => {
-            if (e.key === "Escape") onClose();
+            if (e.key === "Escape") {
+              onClose();
+              setQ("");
+            }
             if (e.key === "ArrowDown") setCursor((c) => Math.min(c + 1, results.length - 1));
             if (e.key === "ArrowUp") setCursor((c) => Math.max(c - 1, 0));
-            if (e.key === "Enter" && results[cursor]) go(results[cursor]);
+            if (e.key === "Enter" && results[safeCursor]) go(results[safeCursor]);
           }}
           placeholder="Search worlds, missions, skills, anchors…"
           className="w-full border-b border-line bg-transparent px-5 py-4 font-sans text-[15px] text-fg placeholder:text-fg-4 focus:outline-none"
@@ -83,12 +98,12 @@ export function SearchPalette({ open, onClose }: { open: boolean; onClose: () =>
               <li
                 key={`${e.kind}:${e.id}`}
                 role="option"
-                aria-selected={i === cursor}
+                aria-selected={i === safeCursor}
                 onMouseEnter={() => setCursor(i)}
                 onClick={() => go(e)}
-                className={cn("flex cursor-pointer items-center gap-3 px-5 py-2.5", i === cursor ? "bg-cyan/10" : "hover:bg-panel-3")}
+                className={cn("flex cursor-pointer items-center gap-3 px-5 py-2.5", i === safeCursor ? "bg-cyan/10" : "hover:bg-panel-3")}
               >
-                <Icon className={cn("h-4 w-4", i === cursor ? "text-cyan" : "text-fg-3")} />
+                <Icon className={cn("h-4 w-4", i === safeCursor ? "text-cyan" : "text-fg-3")} />
                 <div className="min-w-0">
                   <div className="truncate text-[14px] text-fg">{e.title}</div>
                   <div className="truncate font-mono text-[11px] text-fg-3">{e.subtitle}</div>
