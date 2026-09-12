@@ -36,6 +36,7 @@ offline mode (authored hints only) and every other feature works unchanged.
 - `src/server/` — completion transaction and the dashboard snapshot.
 - `src/tutor/` — provider-abstracted tutor (Anthropic or mock), hint-ladder policy.
 - `src/app/` — Next.js routes and API handlers. `src/components/` — UI.
+- `docs/prd/` — the Product Requirements Document (source `.docx` plus a Markdown rendering).
 - `docs/superpowers/specs/` — the design spec for milestone 1.
 
 ## Milestones
