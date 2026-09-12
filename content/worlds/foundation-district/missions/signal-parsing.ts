@@ -152,6 +152,93 @@ def test_second_signal_reported():
     explanation:
       "text[start:stop] copies from start up to but not including stop. Positions 4, 5, 6 are the three unit characters; position 7 is the second dash and is left out.",
   },
+  reviewVariant: {
+    briefing:
+      "The audit log stamps every event with one packed timestamp: 2026-09-12T14:05. The incident timeline needs the year, month, day and clock time as separate fields so events can be grouped by day and sorted by time, and the same cuts must work on every stamp in the log, not just the first one.",
+    objective:
+      "From `stamp` assign `year` (the 4 characters before the first dash), `month` (the 2 characters between the dashes), `day` (the 2 characters between the second dash and the T), `clock` (everything after the T) and `stamp_length` (the total number of characters in `stamp`). From `stamp_b` assign `year_b` and `clock_b` the same way. Keep every field as text. Print the fields of both stamps.",
+    starterCode: `# Two audit-log timestamps.  Format: YYYY-MM-DDTHH:MM
+stamp = "2026-09-12T14:05"
+stamp_b = "2025-12-31T23:59"
+
+# TODO: pull the fields out of stamp, and count its characters
+year = ...
+month = ...
+day = ...
+clock = ...
+stamp_length = ...
+
+# TODO: year and clock from stamp_b
+year_b = ...
+clock_b = ...
+
+print(year, month, day, clock, stamp_length)
+print(year_b, clock_b)
+`,
+    referenceSolution: `stamp = "2026-09-12T14:05"
+stamp_b = "2025-12-31T23:59"
+
+year = stamp[:4]
+month = stamp[5:7]
+day = stamp[8:10]
+clock = stamp.split("T")[1]
+stamp_length = len(stamp)
+
+year_b = stamp_b[:4]
+clock_b = stamp_b.split("T")[1]
+
+print(year, month, day, clock, stamp_length)
+print(year_b, clock_b)
+`,
+    tests: {
+      visible: `
+def test_year_is_the_prefix():
+    "year is the characters before the first dash"
+    y = getattr(solution, "year", None)
+    check(isinstance(y, str), "year should stay as text")
+    check(y == solution.stamp.split("-")[0], "year should be exactly the characters before the first dash")
+
+def test_month_is_the_middle():
+    "month is the field between the dashes"
+    m = getattr(solution, "month", None)
+    check(isinstance(m, str), "month should stay as text so a leading zero is kept")
+    check(m == solution.stamp.split("-")[1], "month should be exactly the characters between the two dashes")
+
+def test_day_is_before_the_t():
+    "day is the field between the second dash and the T"
+    d = getattr(solution, "day", None)
+    check(d == solution.stamp.split("-")[2].split("T")[0], "day should be the two characters after the second dash, stopping before the T")
+
+def test_clock_is_after_the_t():
+    "clock is everything after the T"
+    c = getattr(solution, "clock", None)
+    check(c == solution.stamp.split("T")[1], "clock should be everything after the T")
+
+def test_length_and_output():
+    "stamp_length counts characters and fields are printed"
+    n = getattr(solution, "stamp_length", None)
+    check(type(n) is int and n == len(solution.stamp), "stamp_length should count every character in the stamp, separators included")
+    check(solution.clock in solution_stdout and solution.month in solution_stdout, "The parsed fields of the first stamp should be printed")
+`,
+      hidden: `
+def test_second_stamp_year():
+    check(solution.year_b == solution.stamp_b.split("-")[0], "year_b should be the characters before the first dash of the second stamp")
+
+def test_second_stamp_clock():
+    check(solution.clock_b == solution.stamp_b.split("T")[1], "clock_b should be everything after the T in the second stamp")
+
+def test_no_separators_leak():
+    for v in (solution.year, solution.month, solution.day, solution.clock, solution.year_b, solution.clock_b):
+        check("-" not in v and "T" not in v, "No field should contain a dash or the T; they are separators, not data")
+
+def test_month_keeps_leading_zero():
+    check(solution.month.startswith("0"), "month should keep its leading zero, so it must stay text rather than become a number")
+
+def test_second_stamp_reported():
+    check(solution.clock_b in solution_stdout, "The parsed fields of the second stamp should be printed")
+`,
+    },
+  },
   timeoutMs: 3000,
   onComplete: [
     { kind: "layer", layer: "comms-tower", level: 1 },

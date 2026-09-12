@@ -115,6 +115,62 @@ def test_boost_unchanged():
     explanation:
       "The + operator does different jobs for different types: joining for text, adding for numbers. Python refuses to guess when the two sides disagree. int() makes the sensor value a number so both sides are numeric and + means addition.",
   },
+  reviewVariant: {
+    briefing:
+      "The latency dashboard crashes every time the edge probe reports. The probe sends its reading over the wire as text, the way agents do, and the dashboard adds a jitter allowance to it as a plain number. Python refuses to guess whether that plus sign means arithmetic or gluing text. The reading has to become a number before the maths, and the result has to become text before it sits next to a label. Fix both sides of the boundary.",
+    objective:
+      "Make the script run without error. `budget_ms` must be the probe reading plus the jitter as a float (a decimal number), and the printed line must contain the word Latency followed by the numeric budget. Convert `probe_ms` with float() before adding, and build the printed text with str() or an f-string. Keep `jitter_ms` as it is.",
+    starterCode: `# Latency probe. The agent reports its reading as text, decimal point and all
+probe_ms = "12.5"
+jitter_ms = 3
+
+# BUG: the next two lines crash. The probe gives text, the jitter is a number.
+# TODO: convert at the boundary so the maths is numeric and the print is text
+budget_ms = probe_ms + jitter_ms
+print("Latency: " + budget_ms)
+`,
+    referenceSolution: `probe_ms = "12.5"
+jitter_ms = 3
+
+budget_ms = float(probe_ms) + jitter_ms
+print("Latency: " + str(budget_ms))
+`,
+    tests: {
+      visible: `
+def test_budget_is_a_decimal():
+    "budget_ms is a decimal number, not text"
+    b = getattr(solution, "budget_ms", None)
+    check(type(b) is float, "budget_ms should be a decimal number (float); the probe text has to become a number before the addition")
+
+def test_budget_adds_probe_and_jitter():
+    "budget_ms is the probe reading plus the jitter"
+    check(solution.budget_ms == float(solution.probe_ms) + solution.jitter_ms, "budget_ms should be the probe reading and the jitter added together as numbers")
+
+def test_latency_line_printed():
+    "A Latency line with the budget is printed"
+    check("Latency" in solution_stdout, "The output should contain a Latency label")
+    check(str(solution.budget_ms) in solution_stdout, "The numeric budget should appear in the printed line")
+`,
+      hidden: `
+import re
+
+def test_budget_not_glued_text():
+    check(not isinstance(solution.budget_ms, str), "budget_ms should be arithmetic, not two pieces of text placed side by side")
+
+def test_budget_includes_the_probe():
+    check(solution.budget_ms > solution.jitter_ms, "budget_ms should include the probe reading, not just the jitter")
+
+def test_label_followed_by_number():
+    check(re.search(r"Latency:\\s*\\d+(\\.\\d+)?", solution_stdout) is not None, "The printed line should read as a Latency label followed by the numeric budget")
+
+def test_jitter_unchanged():
+    check(solution.jitter_ms == 3 and type(solution.jitter_ms) is int, "jitter_ms should be left as the whole number it was")
+
+def test_probe_still_text():
+    check(isinstance(solution.probe_ms, str), "probe_ms should stay as the text the agent delivered; convert it where it is used")
+`,
+    },
+  },
   timeoutMs: 3000,
   onComplete: [
     { kind: "layer", layer: "comms-tower", level: 2 },

@@ -172,6 +172,95 @@ def test_report_percentage_is_the_computed_value():
     explanation:
       "Everything cut out of a string is still a string. \"415\" / \"640\" is not arithmetic. int() turns each numeric piece into a real number, and only then does demand / capacity produce a value you can scale to a percentage.",
   },
+  reviewVariant: {
+    briefing:
+      "The edge gateway streams its health as two packed lines: the CPU line carries core count and busy cores jammed together with semicolons, the patch line carries a knowledge-base id with the priority hanging off the end. The fleet console shows a grey tile for the node because nobody has turned those lines into a health report. Produce it: node name in capitals, idle CPU to one decimal place, core count, patch priority.",
+    objective:
+      "Parse the two telemetry lines. From `line_1` assign `cores` and `busy` as ints. From `line_2` assign `priority` (the token after the last dash). Compute `idle_pct` as the idle cores (cores minus busy) divided by cores times 100 (a float). Build `report`, a string spanning at least two lines, that contains the node name in upper case, the idle percentage formatted with exactly one decimal place followed by a percent sign, the core count as digits, and the priority token. Print `report`.",
+    starterCode: `# Raw node telemetry, one packed line per subsystem
+line_1 = "cpu;8;6"              # cpu;CORES;BUSY_CORES
+line_2 = "patch;KB-5031-HIGH"   # patch;ID-NUMBER-PRIORITY
+node_name = "edge gateway"
+
+# TODO: parse line_1 into cores and busy (whole numbers)
+
+# TODO: parse line_2 into priority (the token after the last dash)
+
+# TODO: idle_pct = idle cores as a percentage of all cores (a decimal)
+
+# TODO: build report as a multi-line f-string, then print it
+report = ...
+print(report)
+`,
+    referenceSolution: `line_1 = "cpu;8;6"
+line_2 = "patch;KB-5031-HIGH"
+node_name = "edge gateway"
+
+cores = int(line_1.split(";")[1])
+busy = int(line_1.split(";")[2])
+priority = line_2.split("-")[2]
+idle_pct = (cores - busy) / cores * 100
+
+report = f"""=== {node_name.upper()} HEALTH ===
+CPU: {busy}/{cores} cores busy ({idle_pct:.1f}% idle)
+Patch: {priority}"""
+print(report)
+`,
+    tests: {
+      visible: `
+import re
+
+def test_report_names_node_in_capitals():
+    "The report names the node in capitals"
+    report = getattr(solution, "report", None)
+    check(isinstance(report, str), "report should be a string")
+    check(solution.node_name.upper() in report, "The report should show the node name converted to upper case")
+
+def test_report_shows_idle_with_one_decimal():
+    "Idle share appears as a percentage with one decimal place"
+    check(re.search(r"\\d+\\.\\d%", solution.report) is not None, "The report should show the idle share as a number with exactly one digit after the decimal point, immediately followed by a percent sign")
+
+def test_report_shows_priority():
+    "The patch priority appears in the report"
+    check(solution.line_2.split("-")[-1] in solution.report, "The priority token (the last part of the patch line) should appear in the report")
+
+def test_report_shows_core_count():
+    "The core count appears as digits"
+    check(solution.line_1.split(";")[1] in solution.report, "The total core count should appear in the report as plain digits")
+
+def test_report_multiline_and_printed():
+    "The report spans lines and is printed"
+    check(solution.report.count("\\n") >= 1, "The report should span at least two lines")
+    check(solution.report.strip() in solution_stdout, "The report should be printed exactly as built")
+`,
+      hidden: `
+def test_cores_and_busy_are_ints():
+    c = getattr(solution, "cores", None)
+    b = getattr(solution, "busy", None)
+    check(type(c) is int and type(b) is int, "cores and busy should both be whole numbers converted from the cpu line")
+    parts = solution.line_1.split(";")
+    check(c == int(parts[1]) and b == int(parts[2]), "cores should be the first number in the cpu line and busy the second")
+
+def test_idle_pct_matches_telemetry():
+    u = getattr(solution, "idle_pct", None)
+    check(isinstance(u, float), "idle_pct should be a decimal (float)")
+    parts = solution.line_1.split(";")
+    expected = (int(parts[1]) - int(parts[2])) / int(parts[1]) * 100
+    check(abs(u - expected) < 0.01, "idle_pct should be the idle cores divided by all cores, scaled to a percentage")
+
+def test_priority_is_last_token():
+    p = getattr(solution, "priority", None)
+    check(p == solution.line_2.split("-")[-1], "priority should be exactly the token after the last dash in the patch line")
+    check("-" not in p and ";" not in p, "priority should not carry any separator characters")
+
+def test_report_has_no_placeholders():
+    check("Ellipsis" not in solution.report and "TODO" not in solution.report, "The report should be fully assembled, with no placeholders left in it")
+
+def test_report_percentage_is_computed_value():
+    check(format(solution.idle_pct, ".1f") + "%" in solution.report, "The percentage in the report should be the computed idle share rounded to one decimal place")
+`,
+    },
+  },
   timeoutMs: 3000,
   onComplete: [
     { kind: "layer", layer: "hab-blocks", level: 2 },

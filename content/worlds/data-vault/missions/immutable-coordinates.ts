@@ -136,6 +136,78 @@ def sensor_label(sensor):
     explanation:
       "A list is for data that legitimately changes. A surveyed position must not, so a tuple turns an accidental edit into an immediate TypeError at the line that tried it, instead of a gate quietly moving into the river.",
   },
+  reviewVariant: {
+    briefing:
+      "Change control signed off a release of the API gateway: service name, version and image digest, exactly as built. Overnight a deploy script rewrote the version field in the record and production rolled forward to a build nobody approved. The record is stored in a container that accepts edits. It must live in one that refuses them, while the deploy pipeline can still read each field by position.",
+    objective:
+      "Store `release` as an immutable record holding the service name, version and digest in that order. Unpack it into three top-level names `service`, `version` and `digest`. Write `release_tag(rec)` that takes any such record and returns a string shaped like \"<service>:<version>\" (the digest is left out). Any attempt to assign into `release` by position must raise an error rather than silently succeed.",
+    starterCode: `# Signed release record: service, version, digest. Approved by change control. Must never change.
+release = ["api-gateway", "2.4.1", "sha256:ab12"]
+# TODO 1: the record above is in the wrong container. Pick one that refuses edits after it is written.
+
+# TODO 2: unpack the record into three names: service, version, digest
+
+def release_tag(rec):
+    # TODO 3: return text shaped like  api-gateway:2.4.1
+    ...
+
+print(release_tag(release))
+`,
+    referenceSolution: `release = ("api-gateway", "2.4.1", "sha256:ab12")
+
+service, version, digest = release
+
+def release_tag(rec):
+    return f"{rec[0]}:{rec[1]}"
+
+print(release_tag(release))
+print(f"{service} {version} built from {digest}")
+`,
+    tests: {
+      visible: `
+def test_record_refuses_edits():
+    "release is stored in a container that refuses edits"
+    check(isinstance(solution.release, tuple), "release should be an immutable record type, not an editable list")
+
+def test_unpacked_names():
+    "service, version and digest are unpacked from the record"
+    for n in ("service", "version", "digest"):
+        check(hasattr(solution, n), "The record should be unpacked into service, version and digest at the top level")
+    check(solution.service == solution.release[0] and solution.version == solution.release[1] and solution.digest == solution.release[2], "service, version and digest should hold the three fields of the record in order")
+
+def test_tag_shape():
+    "release_tag joins service and version with a colon"
+    out = solution.release_tag(("auth-svc", "1.9.0", "sha256:ff00"))
+    check(isinstance(out, str) and "auth-svc" in out and "1.9.0" in out, "The tag should include the service name and the version")
+    check(":" in out and "sha256" not in out, "The tag should join service and version with a colon and leave the digest out")
+
+def test_write_attempt_fails():
+    "Assigning into the record by position raises"
+    try:
+        solution.release[1] = "9.9.9"
+    except TypeError:
+        return
+    check(False, "release records must be immutable: writing to a position should raise, not silently change the approved version")
+`,
+      hidden: `
+def test_tag_exact_layout():
+    check(solution.release_tag(("s", "1.0", "d")) == "s:1.0", "The tag should be the service, a colon, then the version, with no spaces")
+
+def test_tag_for_own_record():
+    out = solution.release_tag(solution.release)
+    check(solution.service in out and solution.version in out, "The tag of release should contain its own service and version")
+
+def test_record_has_three_fields():
+    check(len(solution.release) == 3, "The record should hold exactly service, version and digest")
+
+def test_no_list_editing_methods():
+    check(not hasattr(solution.release, "append"), "The record should not expose list-style editing methods")
+
+def test_original_release_intact():
+    check(solution.release[0] == "api-gateway" and solution.release[1] == "2.4.1", "The approved service and version should be unchanged by the rebuild")
+`,
+    },
+  },
   timeoutMs: 3000,
   onComplete: [
     { kind: "layer", layer: "vault-lights", level: 1 },

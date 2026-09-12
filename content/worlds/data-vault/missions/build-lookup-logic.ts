@@ -159,6 +159,100 @@ known_ids = sorted(registry.keys())
     explanation:
       "Square-bracket lookup is strict: a missing key raises KeyError. get() performs the same hashed lookup but hands back the fallback you supplied when nothing is found, so the caller always receives a value.",
   },
+  reviewVariant: {
+    briefing:
+      "The firewall console shows raw port numbers and the operators keep asking \"what runs on 443?\". Worse, typing a port that was never mapped crashes the console mid-shift. The desk needs a keyed index: type a port, get its service name instantly, and get a calm \"unassigned\" instead of a crash when the port is not mapped.",
+    objective:
+      "Add port 53 with the service name \"dns\" to the `services` dictionary. Complete `service_for(port)` so it returns the registered service name, or the string \"unassigned\" when the port is not registered; it must never raise. Then set `service_names` to a sorted list of every registered service name (the values, not the ports) and `port_total` to the number of registered ports.",
+    starterCode: `# Firewall console. Service names indexed by port number.
+services = {
+    22: "ssh",
+    443: "https",
+}
+
+# TODO 1: register DNS under port 53 with the name "dns"
+
+def service_for(port):
+    # TODO 2: return the registered service name, or "unassigned" when the port is not registered.
+    #         The console must never crash on an unknown port.
+    return services[port]
+
+# TODO 3: service_names = every registered service NAME, as a list in alphabetical order
+# TODO 4: port_total = how many ports are registered
+
+print(service_for(443))
+print(service_for(9999))
+`,
+    referenceSolution: `services = {
+    22: "ssh",
+    443: "https",
+}
+
+services[53] = "dns"
+
+def service_for(port):
+    return services.get(port, "unassigned")
+
+service_names = sorted(services.values())
+port_total = len(services)
+
+print(service_for(443))
+print(service_for(9999))
+print(f"{port_total} ports mapped: {service_names}")
+`,
+    tests: {
+      visible: `
+def test_known_port():
+    "service_for returns the registered name for a known port"
+    check(solution.service_for(22) == solution.services[22], "service_for should return exactly the name stored for a registered port")
+
+def test_dns_registered():
+    "DNS is now in the index"
+    check(53 in solution.services, "DNS should be registered under its port number")
+    check(solution.service_for(53) == "dns", "service_for should return the name that was registered for DNS")
+
+def test_unknown_port_does_not_crash():
+    "An unregistered port returns a calm fallback"
+    try:
+        out = solution.service_for(9999)
+    except KeyError:
+        check(False, "Looking up an unregistered port must not raise KeyError; the console has to stay up")
+    check(isinstance(out, str) and "unassigned" in out.lower(), "An unregistered port should return short text saying the port is unassigned")
+
+def test_names_and_total():
+    "service_names lists every name in order; port_total counts entries"
+    names = getattr(solution, "service_names", None)
+    check(isinstance(names, list) and sorted(names) == sorted(solution.services.values()), "service_names should contain every registered service name and nothing else")
+    check(names == sorted(names), "service_names should be in alphabetical order")
+    check(getattr(solution, "port_total", None) == len(solution.services), "port_total should equal the number of registered ports")
+`,
+      hidden: `
+def test_many_unknown_ports():
+    for p in [0, 21, 65535]:
+        try:
+            out = solution.service_for(p)
+        except KeyError:
+            check(False, "Unregistered ports of any value must return the fallback, never raise")
+        check(isinstance(out, str) and "unassigned" in out.lower(), "Every unregistered port should produce the unassigned text")
+
+def test_lookup_reads_live_index():
+    solution.services[8080] = "proxy"
+    try:
+        check(solution.service_for(8080) == "proxy", "service_for should read live from the index rather than return a hard-coded answer")
+    finally:
+        del solution.services[8080]
+
+def test_total_is_int():
+    check(isinstance(solution.port_total, int), "port_total should be a whole number")
+
+def test_index_still_dict():
+    check(isinstance(solution.services, dict) and len(solution.services) >= 3, "The index should remain a dictionary and now hold DNS too")
+
+def test_names_are_values_not_keys():
+    check(all(isinstance(n, str) for n in solution.service_names), "service_names should hold the service names, not the port numbers")
+`,
+    },
+  },
   timeoutMs: 3000,
   onComplete: [
     { kind: "layer", layer: "index-spire", level: 1 },

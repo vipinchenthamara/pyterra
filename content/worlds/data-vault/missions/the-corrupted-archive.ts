@@ -187,6 +187,126 @@ missing_ids = set(clean_ids) - set(raw_names)
     explanation:
       "The left set is every clean id; the right set is every id that has a name. Set difference removes the named ones, leaving precisely the ids the name index never received.",
   },
+  reviewVariant: {
+    briefing:
+      "The identity provider went down mid-sync and the access review has to be rebuilt from what survived: a login feed that replayed itself, so users appear several times; a role table that stopped receiving entries partway through; and a review window record left in an editable list that someone has already nudged. Rebuild it: one clean user list, a role lookup that never crashes, a precise set of the users who have no role, a window nobody can edit, and one summary the audit dashboard can read.",
+    objective:
+      "From the starter data produce: `reviewed_users`, a sorted list with each username exactly once; `role_of(user)`, which returns the assigned role or the string \"no-role\" and never raises; `unassigned`, a set of the users in reviewed_users that have no entry in roles; `window`, the same day and hours as an immutable record; and `review`, a dict with keys \"users\" (number of reviewed users), \"unassigned\" (the set) and \"window\" (the record). Print one summary line that includes the number of reviewed users.",
+    starterCode: `# Access review after the identity-provider outage: the raw pieces that survived.
+raw_logins = ["ana", "bo", "ana", "chen", "dee", "bo", "ana"]
+roles = {
+    "ana": "admin",
+    "bo": "analyst",
+    "chen": "analyst",
+}
+window = ["2026-09-12", 24]   # day, hours. TODO 4: this record must become impossible to edit.
+
+# TODO 1: reviewed_users = every username exactly once, sorted alphabetically, as a list
+
+def role_of(user):
+    # TODO 2: the assigned role, or "no-role". Must never raise.
+    ...
+
+# TODO 3: unassigned = a set of the users in reviewed_users that have no entry in roles
+# TODO 5: review = a dict with keys "users", "unassigned" and "window"
+# TODO 6: print one summary line that includes the number of reviewed users
+`,
+    referenceSolution: `raw_logins = ["ana", "bo", "ana", "chen", "dee", "bo", "ana"]
+roles = {
+    "ana": "admin",
+    "bo": "analyst",
+    "chen": "analyst",
+}
+
+reviewed_users = sorted(set(raw_logins))
+
+def role_of(user):
+    return roles.get(user, "no-role")
+
+unassigned = set(reviewed_users) - set(roles)
+window = ("2026-09-12", 24)
+
+review = {
+    "users": len(reviewed_users),
+    "unassigned": unassigned,
+    "window": window,
+}
+
+print(f"Access review: {review['users']} users, {len(unassigned)} without a role, window {window[0]} for {window[1]} hours")
+`,
+    tests: {
+      visible: `
+def test_reviewed_users_sorted_unique():
+    "reviewed_users lists each user once, in alphabetical order"
+    u = getattr(solution, "reviewed_users", None)
+    check(isinstance(u, list), "reviewed_users should be a list")
+    check(len(u) == len(set(u)) and set(u) == set(solution.raw_logins), "reviewed_users should contain every distinct username from the login feed, each exactly once")
+    check(u == sorted(u), "reviewed_users should be in alphabetical order")
+
+def test_role_of_known_and_unknown():
+    "role_of returns the assigned role, or no-role without crashing"
+    check(solution.role_of("ana") == solution.roles["ana"], "role_of a user with an entry should return that stored role")
+    try:
+        out = solution.role_of("dee")
+    except KeyError:
+        check(False, "role_of a user with no entry must not raise KeyError")
+    check(out == "no-role", "role_of a user with no entry should return the no-role marker text")
+
+def test_unassigned():
+    "unassigned holds exactly the reviewed users with no role"
+    s = getattr(solution, "unassigned", None)
+    check(isinstance(s, set), "unassigned should be a set")
+    check(s == set(solution.reviewed_users) - set(solution.roles), "unassigned should contain exactly the reviewed users that have no entry in roles")
+
+def test_window_is_immutable():
+    "window is a record that cannot be edited"
+    check(isinstance(solution.window, tuple), "window should be an immutable record type")
+    check(list(solution.window) == ["2026-09-12", 24], "window should keep the same day and hours as before the rebuild")
+
+def test_review_summary():
+    "review dict reports users, unassigned and window"
+    r = getattr(solution, "review", None)
+    check(isinstance(r, dict), "review should be a dictionary")
+    check(r.get("users") == len(solution.reviewed_users), "review users should equal the number of reviewed users")
+    check(r.get("unassigned") == solution.unassigned, "review unassigned should be the unassigned set")
+    check(isinstance(r.get("window"), tuple), "review window should be the immutable window record")
+`,
+      hidden: `
+def test_summary_printed():
+    check(str(len(solution.reviewed_users)) in solution_stdout, "The printed summary should include the number of reviewed users")
+
+def test_role_of_every_reviewed_user():
+    for u in solution.reviewed_users:
+        try:
+            out = solution.role_of(u)
+        except KeyError:
+            check(False, "role_of must never raise for any reviewed user")
+        check(isinstance(out, str) and out != "", "role_of should always return non-empty text")
+
+def test_role_of_reads_live_roles():
+    solution.roles["dee"] = "auditor"
+    try:
+        check(solution.role_of("dee") == "auditor", "role_of should read from roles rather than return a hard-coded answer")
+    finally:
+        del solution.roles["dee"]
+
+def test_unassigned_have_no_role():
+    for u in solution.unassigned:
+        check(u not in solution.roles, "Every user in unassigned should be absent from roles")
+    check(len(solution.unassigned) >= 1, "At least one user has no role in this review and should be reported")
+
+def test_raw_feed_left_as_evidence():
+    check(len(solution.raw_logins) == 7, "The raw login feed should be left intact as evidence, not deduplicated in place")
+
+def test_window_write_fails():
+    try:
+        solution.window[1] = 8
+    except TypeError:
+        return
+    check(False, "Writing into the window record should raise instead of changing it")
+`,
+    },
+  },
   timeoutMs: 4000,
   onComplete: [
     { kind: "layer", layer: "vault-shell", level: 2 },

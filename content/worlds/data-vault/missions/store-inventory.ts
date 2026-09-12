@@ -139,6 +139,77 @@ last_asset = assets[-1]
     explanation:
       "A negative index is counted from the end of the sequence: -1 is the last entry, -2 the one before it. The registry can grow to a thousand assets and assets[-1] still reads the newest one.",
   },
+  reviewVariant: {
+    briefing:
+      "The security desk runs an on-call rotation, and today it lives in a group chat: nobody can say who leads this week, who joined most recently, or who covers the weekend. A new engineer has just been cleared for the rotation. Ops needs one ordered roster they can extend, read from either end, slice and query in a single line each.",
+    objective:
+      "Starting from the `on_call` list, append \"dee\", then set five top-level variables: `lead` (the first name on the rotation), `newest` (the final name), `weekend_pair` (a list holding exactly the last two names), `roster_size` (how many people are on the rotation) and `has_chen` (True or False: whether \"chen\" is on the rotation).",
+    starterCode: `# On-call rotation for the security desk, in the order people take the pager.
+on_call = ["ana", "bo", "chen"]
+
+# TODO 1: "dee" has just been cleared for the rotation. Add her to the END.
+# TODO 2: lead = the first name; newest = the final name (whatever position it lands in)
+# TODO 3: weekend_pair = a list of the LAST two names only (a slice)
+# TODO 4: roster_size = how many people are on the rotation
+# TODO 5: has_chen = True if "chen" is on the rotation, False otherwise
+
+print(on_call)
+`,
+    referenceSolution: `on_call = ["ana", "bo", "chen"]
+
+on_call.append("dee")
+lead = on_call[0]
+newest = on_call[-1]
+weekend_pair = on_call[-2:]
+roster_size = len(on_call)
+has_chen = "chen" in on_call
+
+print(on_call)
+print(f"{roster_size} on rotation, lead {lead}, newest {newest}, weekend {weekend_pair}, chen covered: {has_chen}")
+`,
+    tests: {
+      visible: `
+def test_dee_joined_at_the_end():
+    "The new engineer is added at the end of the rotation"
+    r = getattr(solution, "on_call", None)
+    check(isinstance(r, list) and len(r) > 3, "Adding an engineer should grow the rotation list by one entry")
+    check(r[-1] == "dee", "The newest engineer should sit at the end of the rotation")
+
+def test_lead_and_newest():
+    "lead and newest read the two ends of the rotation"
+    check(getattr(solution, "lead", None) == solution.on_call[0], "lead should be whoever sits at the front of the rotation")
+    check(getattr(solution, "newest", None) == solution.on_call[-1], "newest should be whoever sits at the back of the rotation")
+
+def test_weekend_pair_slice():
+    "weekend_pair holds exactly the last two names"
+    pair = getattr(solution, "weekend_pair", None)
+    check(isinstance(pair, list), "weekend_pair should be a list (a slice of the rotation)")
+    check(pair == solution.on_call[-2:], "weekend_pair should contain the last two names on the rotation, in order, and nothing else")
+
+def test_size_and_membership():
+    "roster_size and has_chen describe the rotation"
+    check(getattr(solution, "roster_size", None) == len(solution.on_call), "roster_size should equal the number of people currently on the rotation")
+    h = getattr(solution, "has_chen", None)
+    check(isinstance(h, bool) and h is True, "has_chen should be a True/False answer reporting that chen is on the rotation")
+`,
+      hidden: `
+def test_original_order_kept():
+    check(solution.on_call[:3] == ["ana", "bo", "chen"], "The three original engineers should keep their positions")
+
+def test_nobody_listed_twice():
+    check(len(set(solution.on_call)) == len(solution.on_call), "Each engineer should appear on the rotation exactly once")
+
+def test_pair_ends_with_newest():
+    check(len(solution.weekend_pair) == 2 and solution.weekend_pair[-1] == solution.newest, "weekend_pair should hold two names and end with the newest engineer")
+
+def test_lead_not_in_pair():
+    check(solution.lead not in solution.weekend_pair, "weekend_pair should not include the lead at the front of the rotation")
+
+def test_newest_is_text():
+    check(isinstance(solution.newest, str), "newest should be a single name string, not a list")
+`,
+    },
+  },
   timeoutMs: 3000,
   onComplete: [
     { kind: "layer", layer: "vault-shell", level: 1 },

@@ -5,18 +5,47 @@ upgrade sixteen districts by writing Python, and a Claude-powered teaching assis
 
 ## Run it
 
+**Prerequisites:** Node.js 20.19 or newer (24 recommended) and npm. Nothing else: Python runs inside the
+browser via WebAssembly, the database is a local SQLite file, and no accounts or cloud services are needed.
+
 ```bash
+git clone https://github.com/vipinchenthamara/pyterra.git
+cd pyterra
 npm install
 npm run dev
 ```
 
-Open http://localhost:3000. The first run creates `data/architect.db` (SQLite) and vendors the Pyodide runtime
-into `public/py/vendor/` so Python runs entirely in your browser, offline, with no server-side code execution.
+Open http://localhost:3000.
 
-### Enable the Claude tutor
+What happens on first run:
 
-Copy `.env.local.example` to `.env.local` and set `ANTHROPIC_API_KEY`. Without a key the assistant runs in
-offline mode (authored hints only) and every other feature works unchanged.
+- `npm install` copies the Pyodide runtime (about 13 MB) from `node_modules` into `public/py/vendor/`, so the
+  app works offline and never loads code from a CDN.
+- The first request creates `data/architect.db` and applies the migrations. Both `data/` and
+  `public/py/vendor/` are git-ignored.
+- The first mission you open warms a Python worker in the background; the first Run takes about a second.
+
+### Production build
+
+```bash
+npm run build
+npm start
+```
+
+### Enable the Claude tutor (optional)
+
+```bash
+cp .env.local.example .env.local
+```
+
+Set `ANTHROPIC_API_KEY` in `.env.local` and restart the dev server. Without a key the assistant runs in
+offline mode (authored hints only) and every other feature works unchanged. The key stays on the server;
+it is never sent to the browser.
+
+### Reset or export progress
+
+Profile → Export progress downloads a JSON backup. Profile → Reset all progress wipes the database after you
+type RESET. You can also stop the server and delete `data/architect.db*`.
 
 ## Scripts
 
@@ -41,11 +70,8 @@ offline mode (authored hints only) and every other feature works unchanged.
 
 ## Milestones
 
-1. **Now:** shell, engine, Worlds 1–2 authored (Foundation District, Data Vault), tutor, review queue.
-2. Worlds 3–5 (Logic Gate, Drone Fleet, Automation Factory), variant review tests.
-3. Worlds 6–9.
+1. Done: shell, engine, Worlds 1–2 authored (Foundation District, Data Vault), tutor, review queue.
+2. Done: Worlds 3–5 (Logic Gate, Drone Fleet, Automation Factory) and fresh-context review variants for every mission.
+3. Next: Worlds 6–9 (Resilience Reactor, Archive Core, Network District, Architect Lab).
 4. Server-side runner for Worlds 10–16 (packages, FastAPI, Docker, LLM, RAG, agents).
 
-## Reset
-
-Profile → Reset all progress, or delete `data/architect.db*` while the server is stopped.

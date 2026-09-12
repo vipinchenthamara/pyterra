@@ -156,6 +156,100 @@ def test_utilisation_is_reported():
     explanation:
       "26 / 8 is 3.25. Floor division 26 // 8 keeps only the whole number of times 8 fits, which is the number of complete shifts. The % operator then recovers the 2 hours that did not fit.",
   },
+  reviewVariant: {
+    briefing:
+      "The object store reports 2000 GB of quota with 1350 GB already used, and the patch team has 47 servers to reboot in batches of 6. Before the change window opens, ops wants four numbers without a spreadsheet: how much quota is free, what share of it is used, how many complete batches of 6 the reboot needs, and how many servers are left over for a final partial batch.",
+    objective:
+      "Using the given `quota_gb`, `used_gb` and `servers`, assign: `free_gb` (quota minus used), `used_pct` (used as a percentage of quota, a float, not rounded), `full_batches` (how many complete batches of 6 servers fit in `servers`, a whole number) and `stragglers` (the servers left over after those full batches). Print all four. Do not change the three inputs.",
+    starterCode: `# Change-window numbers
+quota_gb = 2000
+used_gb = 1350
+servers = 47
+
+# TODO: quota still free
+free_gb = ...
+
+# TODO: used as a percentage of quota (a decimal, do not round)
+used_pct = ...
+
+# TODO: how many complete batches of 6 servers fit (a whole number)
+full_batches = ...
+
+# TODO: servers left over after the full batches
+stragglers = ...
+
+print("Free GB:", free_gb)
+print("Used %:", used_pct)
+print("Full batches:", full_batches)
+print("Stragglers:", stragglers)
+`,
+    referenceSolution: `quota_gb = 2000
+used_gb = 1350
+servers = 47
+
+free_gb = quota_gb - used_gb
+used_pct = used_gb / quota_gb * 100
+full_batches = servers // 6
+stragglers = servers % 6
+
+print("Free GB:", free_gb)
+print("Used %:", used_pct)
+print("Full batches:", full_batches)
+print("Stragglers:", stragglers)
+`,
+    tests: {
+      visible: `
+def test_free_is_the_headroom():
+    "Free quota is what remains after usage"
+    f = getattr(solution, "free_gb", None)
+    check(type(f) in (int, float), "free_gb should be a number")
+    check(f == solution.quota_gb - solution.used_gb, "free_gb should be the quota left once the used amount is subtracted")
+
+def test_used_pct_is_a_percentage():
+    "Used share is a percentage of quota"
+    u = getattr(solution, "used_pct", None)
+    check(type(u) is float, "used_pct should be a decimal (a float), which is what true division produces")
+    check(abs(u - solution.used_gb / solution.quota_gb * 100) < 0.01, "used_pct should be used divided by quota, scaled up to a percentage")
+
+def test_full_batches_is_whole():
+    "Full batches is a whole count"
+    b = getattr(solution, "full_batches", None)
+    check(type(b) is int, "full_batches should be a whole number with no fraction")
+    check(b == solution.servers // 6, "full_batches should be how many complete batches of 6 fit inside the server count")
+
+def test_stragglers_is_remainder():
+    "Stragglers is what does not fill a batch"
+    s = getattr(solution, "stragglers", None)
+    check(type(s) is int, "stragglers should be a whole number of servers")
+    check(0 <= s < 6, "stragglers should be fewer than one full batch")
+    check(s == solution.servers % 6, "stragglers should be the servers remaining after the full batches are taken out")
+
+def test_numbers_reported():
+    "All four numbers appear in the output"
+    out = solution_stdout
+    check(str(solution.free_gb) in out, "The free quota should be printed")
+    check(str(solution.full_batches) in out, "The number of full batches should be printed")
+    check(str(solution.stragglers) in out, "The stragglers count should be printed")
+`,
+      hidden: `
+def test_batches_reassemble_the_fleet():
+    check(solution.full_batches * 6 + solution.stragglers == solution.servers, "full batches times 6 plus the stragglers should add back up to every server")
+
+def test_used_pct_not_a_fraction():
+    check(0 < solution.used_pct < 100, "used_pct should be a percentage, not a fraction between 0 and 1")
+
+def test_used_pct_keeps_decimal():
+    u = solution.used_pct
+    check(u != int(u), "used_pct should keep its decimal part; do not round it or use floor division")
+
+def test_inputs_unchanged():
+    check(solution.quota_gb == 2000 and solution.used_gb == 1350 and solution.servers == 47, "The three inputs should be left exactly as reported")
+
+def test_used_pct_reported():
+    check(str(solution.used_pct)[:4] in solution_stdout, "The used percentage should be printed")
+`,
+    },
+  },
   timeoutMs: 3000,
   onComplete: [
     { kind: "layer", layer: "hab-blocks", level: 1 },

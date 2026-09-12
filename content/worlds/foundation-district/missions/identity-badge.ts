@@ -141,6 +141,83 @@ def test_raw_inputs_untouched():
     explanation:
       "Each string method returns a fresh string and leaves the original untouched. raw_name.strip() produces the trimmed copy, and .upper() is called on that copy, so the chain reads left to right as a pipeline.",
   },
+  reviewVariant: {
+    briefing:
+      "The quarterly access review pulls service accounts out of the old IAM export, and every field arrives differently: the account name padded with spaces and in mixed case, the role shouting in capitals, the environment with stray spaces. The reviewers want one normalised audit line per account, three fields separated by \" / \", so the sheet sorts and matches cleanly.",
+    objective:
+      "`account` is `raw_account` with surrounding whitespace removed and converted to lower case. `role` is `raw_role` in lower case. `env` is `raw_env` with surrounding whitespace removed and converted to upper case. `audit_line` is a single f-string of the three normalised fields separated by \" / \" (space, slash, space). Print `audit_line`. Do not change the raw inputs.",
+    starterCode: `# Access-review export. Fields arrive as the old IAM system stored them
+raw_account = "  SVC_Backup  "
+raw_role = "READ-ONLY"
+raw_env = " prod "
+
+# TODO: normalise each field
+account = ...   # raw_account with surrounding spaces removed, in lower case
+role = ...      # raw_role in lower case
+env = ...       # raw_env with surrounding spaces removed, in UPPER CASE
+
+# TODO: one f-string: account, role and env separated by " / "
+audit_line = ...
+
+print(audit_line)
+`,
+    referenceSolution: `raw_account = "  SVC_Backup  "
+raw_role = "READ-ONLY"
+raw_env = " prod "
+
+account = raw_account.strip().lower()
+role = raw_role.lower()
+env = raw_env.strip().upper()
+
+audit_line = f"{account} / {role} / {env}"
+
+print(audit_line)
+`,
+    tests: {
+      visible: `
+def test_audit_line_is_clean():
+    "The audit line has no stray whitespace"
+    line = getattr(solution, "audit_line", None)
+    check(isinstance(line, str), "audit_line should be a string")
+    check(line == line.strip(), "audit_line should have no leading or trailing spaces")
+
+def test_audit_line_has_three_fields():
+    "Three fields separated by a slash"
+    check(solution.audit_line.count(" / ") == 2, "The audit line should contain exactly three fields, so exactly two space-slash-space separators")
+
+def test_account_is_normalised():
+    "The account is trimmed and lower case"
+    a = getattr(solution, "account", None)
+    check(a == solution.raw_account.strip().lower(), "account should be the raw account with surrounding spaces removed and every letter in lower case")
+
+def test_env_is_normalised():
+    "The environment is trimmed and upper case"
+    e = getattr(solution, "env", None)
+    check(e == solution.raw_env.strip().upper(), "env should be the raw environment with surrounding spaces removed and in capitals")
+
+def test_audit_line_printed():
+    "The audit line is printed"
+    check(solution.audit_line in solution_stdout, "The finished audit line should be printed")
+`,
+      hidden: `
+def test_role_is_lower():
+    check(solution.role == solution.raw_role.lower(), "role should be the raw role in lower case")
+
+def test_fields_in_order():
+    parts = solution.audit_line.split(" / ")
+    check(parts == [solution.account, solution.role, solution.env], "The audit line should be the three normalised fields in order: account, role, env")
+
+def test_no_double_spaces():
+    check("  " not in solution.audit_line, "The audit line should not contain runs of spaces from the raw export")
+
+def test_account_has_no_capitals():
+    check(solution.account == solution.account.lower(), "account should contain no capital letters")
+
+def test_raw_inputs_untouched():
+    check(solution.raw_account == "  SVC_Backup  " and solution.raw_env == " prod ", "The raw export values should be left as they arrived; build normalised copies instead")
+`,
+    },
+  },
   timeoutMs: 3000,
   onComplete: [
     { kind: "layer", layer: "district-sign", level: 1 },

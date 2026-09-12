@@ -140,6 +140,81 @@ def test_output_has_one_line_per_value():
     explanation:
       "25 is an int, a whole count. 25.0 is a float, a measurement. A core reading can sit at 25.5 or 99.9, so it needs the type that can carry a fraction.",
   },
+  reviewVariant: {
+    briefing:
+      "A new VPN gateway has been racked in the east region and the NOC dashboard shows a blank tile for it. The gateway cannot register until it can name its own hostname, how many tunnels it is carrying, how long it has been up, and whether the latest patch is on it. Give it those four values and have it announce them.",
+    objective:
+      "Assign four top-level variables: `gateway_name` (text), `active_tunnels` (a whole number), `uptime_hours` (a decimal number of hours) and `patched` (True or False). Print each of the four values so all four appear in the output, one per line.",
+    starterCode: `# NOC registration for a new VPN gateway. Nothing is named yet.
+# TODO: replace each ... with a value of the right kind
+gateway_name = ...     # the gateway's hostname (text)
+active_tunnels = ...   # tunnels currently up (a whole number)
+uptime_hours = ...     # hours since the last reboot (a decimal)
+patched = ...          # is the latest patch applied? (True or False)
+
+# TODO: print all four values, one per line
+`,
+    referenceSolution: `gateway_name = "vpn-gw-east"
+active_tunnels = 42
+uptime_hours = 312.5
+patched = True
+
+print(gateway_name)
+print(active_tunnels)
+print(uptime_hours)
+print(patched)
+`,
+    tests: {
+      visible: `
+def test_gateway_has_a_hostname():
+    "The gateway has a hostname"
+    name = getattr(solution, "gateway_name", None)
+    check(isinstance(name, str) and name.strip() != "", "gateway_name should hold non-empty text")
+
+def test_tunnels_is_a_whole_number():
+    "Tunnel count is a whole number"
+    t = getattr(solution, "active_tunnels", None)
+    check(type(t) is int, "active_tunnels should be a whole number (an int, no quotes and no decimal point)")
+    check(t >= 0, "active_tunnels should not be negative")
+
+def test_uptime_is_a_decimal():
+    "Uptime is a decimal measurement"
+    u = getattr(solution, "uptime_hours", None)
+    check(type(u) is float, "uptime_hours should be a decimal (a float with a decimal point)")
+    check(u >= 0.0, "uptime_hours should not be negative")
+
+def test_patched_is_a_flag():
+    "Patched is a yes/no flag"
+    p = getattr(solution, "patched", None)
+    check(type(p) is bool, "patched should be True or False, not text or a number")
+
+def test_values_are_announced():
+    "All four values appear in the output"
+    out = solution_stdout
+    check(solution.gateway_name in out, "The hostname should be printed")
+    check(str(solution.active_tunnels) in out, "The tunnel count should be printed")
+    check(str(solution.uptime_hours) in out, "The uptime should be printed")
+    check(str(solution.patched) in out, "The patched flag should be printed")
+`,
+      hidden: `
+def test_hostname_has_letters():
+    check(any(ch.isalpha() for ch in solution.gateway_name), "gateway_name should contain letters, not just digits or symbols")
+
+def test_tunnels_not_text():
+    check(not isinstance(solution.active_tunnels, str), "active_tunnels should be a number the NOC can add up, not text in quotes")
+
+def test_uptime_not_text():
+    check(not isinstance(solution.uptime_hours, str), "uptime_hours should be a number, not text in quotes")
+
+def test_patched_is_real_boolean():
+    check(solution.patched is True or solution.patched is False, "patched should be the value True or False, not those words in quotes")
+
+def test_one_line_per_value():
+    lines = [l for l in solution_stdout.splitlines() if l.strip()]
+    check(len(lines) >= 4, "Each of the four values should be printed on its own line")
+`,
+    },
+  },
   timeoutMs: 3000,
   onComplete: [
     { kind: "layer", layer: "ground-grid", level: 1 },

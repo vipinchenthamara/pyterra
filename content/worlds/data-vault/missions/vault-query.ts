@@ -159,6 +159,101 @@ online_count = statuses.count("online")
     explanation:
       "The chain hard-codes the registry inside the logic, which is why last week's asset went missing for three days. Membership in a set is driven by the data itself and costs the same whether there are three ids or three thousand.",
   },
+  reviewVariant: {
+    briefing:
+      "The perimeter gateway answers one question per packet: \"is this source address on the allowlist?\". The code that answers it is a chain of `or` comparisons, and the deny tally beside it is a hand-written sum that grows a term for every verdict. Last week a new address was added to the allowlist file but not to the chain, and a partner integration was blocked for a day. The gateway needs the same answers from code that stays one line long however many addresses exist.",
+    objective:
+      "Keep the behaviour, change the structure. Build `allowed` as a set from `allow_list`. Rewrite `is_allowed(ip)` so it returns True or False by testing membership in `allowed`. Replace the hand-count so `deny_count` equals the number of entries in `verdicts` that read \"deny\", computed with a single list method. Set `last_event` to the final entry of `events` and `last_verdict` to that event's verdict value.",
+    starterCode: `# Perimeter allowlist and the last few decisions the gateway made.
+events = [
+    {"ip": "10.0.0.7", "verdict": "deny"},
+    {"ip": "10.0.0.2", "verdict": "allow"},
+    {"ip": "10.0.0.9", "verdict": "deny"},
+]
+allow_list = ["10.0.0.1", "10.0.0.2", "10.0.0.3"]
+verdicts = ["deny", "allow", "deny"]
+
+# TODO 1: allowed = a set holding every address from allow_list
+
+# --- Today's gateway check. It works. It grows one line per address. ---
+def is_allowed(ip):
+    # TODO 2: replace the chain below with a membership test against allowed
+    return ip == "10.0.0.1" or ip == "10.0.0.2" or ip == "10.0.0.3"
+
+# TODO 3: replace the hand-count below with one list method call
+deny_count = int(verdicts[0] == "deny") + int(verdicts[1] == "deny") + int(verdicts[2] == "deny")
+
+# TODO 4: last_event = the final event; last_verdict = that event's "verdict" value
+
+print("10.0.0.2 allowed:", is_allowed("10.0.0.2"))
+print("denied:", deny_count)
+`,
+    referenceSolution: `events = [
+    {"ip": "10.0.0.7", "verdict": "deny"},
+    {"ip": "10.0.0.2", "verdict": "allow"},
+    {"ip": "10.0.0.9", "verdict": "deny"},
+]
+allow_list = ["10.0.0.1", "10.0.0.2", "10.0.0.3"]
+verdicts = ["deny", "allow", "deny"]
+
+allowed = set(allow_list)
+
+def is_allowed(ip):
+    return ip in allowed
+
+deny_count = verdicts.count("deny")
+
+last_event = events[-1]
+last_verdict = last_event["verdict"]
+
+print("10.0.0.2 allowed:", is_allowed("10.0.0.2"))
+print("denied:", deny_count)
+print("last:", last_event["ip"], last_verdict)
+`,
+    tests: {
+      visible: `
+def test_allowed_is_a_set():
+    "allowed is a set holding every allowlisted address"
+    a = getattr(solution, "allowed", None)
+    check(isinstance(a, set), "allowed should be a set, so membership is a single hashed lookup")
+    check(a == set(solution.allow_list), "allowed should contain exactly the addresses from allow_list")
+
+def test_is_allowed_member_and_non_member():
+    "is_allowed answers True for allowlisted addresses and False otherwise"
+    check(solution.is_allowed("10.0.0.1") is True, "An allowlisted address should be reported with a True")
+    check(solution.is_allowed("192.168.1.1") is False, "An address outside the allowlist should be reported with a False")
+
+def test_deny_count():
+    "deny_count matches how many verdicts read deny"
+    check(solution.deny_count == solution.verdicts.count("deny"), "deny_count should equal the number of entries in verdicts that are deny")
+
+def test_last_event_and_verdict():
+    "last_event and last_verdict read the tail of the events list"
+    check(getattr(solution, "last_event", None) == solution.events[-1], "last_event should be the final entry in events")
+    check(getattr(solution, "last_verdict", None) == solution.events[-1]["verdict"], "last_verdict should be the verdict value of that final event")
+`,
+      hidden: `
+def test_is_allowed_reads_the_set():
+    solution.allowed.add("10.0.0.42")
+    try:
+        check(solution.is_allowed("10.0.0.42") is True, "is_allowed should consult the allowed set, so an address added to the set is allowed without editing code")
+    finally:
+        solution.allowed.discard("10.0.0.42")
+
+def test_is_allowed_returns_bool():
+    check(isinstance(solution.is_allowed("10.0.0.1"), bool) and isinstance(solution.is_allowed("nope"), bool), "is_allowed should return a plain True or False")
+
+def test_last_event_is_dict():
+    check(isinstance(solution.last_event, dict) and "verdict" in solution.last_event, "last_event should be a single event dictionary with a verdict key")
+
+def test_deny_count_is_int():
+    check(isinstance(solution.deny_count, int), "deny_count should be a whole number")
+
+def test_sources_untouched():
+    check(len(solution.events) == 3 and len(solution.verdicts) == 3 and len(solution.allow_list) == 3, "The source events, verdicts and allow_list should not be modified by the refactor")
+`,
+    },
+  },
   timeoutMs: 3000,
   onComplete: [
     { kind: "layer", layer: "citizen-flow", level: 1 },
